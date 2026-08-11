@@ -4,16 +4,16 @@ import androidx.compose.ui.graphics.Color
 
 /* ── Deep Blue-Violet (Indigo-Slate) palette ── */
 
-// Light theme
-val TempusPrimary        = Color(0xFF1E3A5F)   // deep blue w/ violet undertone
-val TempusOnPrimary      = Color(0xFFFFFFFF)   // white — 11.8:1 on primary
+// Light theme — vibrant blue-violet, still AA-compliant on white
+val TempusPrimary        = Color(0xFF3B5BA8)   // blue w/ violet undertone
+val TempusOnPrimary      = Color(0xFFFFFFFF)   // white — 6.2:1 on primary
 val TempusPrimaryContainer = Color(0xFFD6E3F8) // soft blue-lavender
 val TempusOnPrimaryContainer = Color(0xFF001B3D) // very dark blue
 
-// Dark theme
+// Dark theme — bright blue-violet (the one you liked)
 val TempusDarkPrimary    = Color(0xFF7BA3F5)   // medium-bright blue-violet
 val TempusDarkOnPrimary  = Color(0xFF002B5C)   // dark blue
-val TempusDarkPrimaryContainer = Color(0xFF1E3A5F) // same deep blue
+val TempusDarkPrimaryContainer = Color(0xFF1E3A5F) // deep blue
 val TempusDarkOnPrimaryContainer = Color(0xFFD6E3F8) // soft blue-lavender
 
 // Status colours (unchanged — they work on any background)
