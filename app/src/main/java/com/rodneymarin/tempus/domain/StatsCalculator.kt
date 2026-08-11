@@ -105,9 +105,7 @@ object StatsCalculator {
             if (start == today) "Hoy"
             else start.format(DateTimeFormatter.ofPattern("d MMM", locale))
         FrequencyPeriod.WEEK -> {
-            val s = start.format(DateTimeFormatter.ofPattern("d MMM", locale))
-            val e = end.format(DateTimeFormatter.ofPattern("d MMM", locale))
-            "$s – $e"
+            start.format(DateTimeFormatter.ofPattern("d MMM", locale))
         }
         FrequencyPeriod.MONTH ->
             start.month.getDisplayName(TextStyle.SHORT, locale).replaceFirstChar { it.uppercase(locale) }

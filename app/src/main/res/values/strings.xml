@@ -55,4 +55,8 @@
     <string name="unit_week">por semana</string>
     <string name="unit_month">por mes</string>
     <string name="history_empty">Sin registros aún</string>
+    <string name="menu">Menú</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_system">Sistema</string>
 </resources>

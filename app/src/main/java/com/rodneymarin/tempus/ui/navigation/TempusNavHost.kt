@@ -7,17 +7,23 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.rodneymarin.tempus.TempusApp
 import com.rodneymarin.tempus.ui.dashboard.DashboardScreen
 import com.rodneymarin.tempus.ui.detail.TrackerDetailScreen
 import com.rodneymarin.tempus.ui.editor.TrackerEditorScreen
 
 @Composable
-fun TempusNavHost(navController: NavHostController = rememberNavController()) {
+fun TempusNavHost(
+    navController: NavHostController = rememberNavController(),
+) {
+    val app = androidx.compose.ui.platform.LocalContext.current.applicationContext as TempusApp
+    val themePrefs = app.container.themePrefs
     NavHost(navController = navController, startDestination = Routes.DASHBOARD) {
         composable(Routes.DASHBOARD) {
             DashboardScreen(
                 onOpenTracker = { id -> navController.navigate(Routes.detail(id)) },
                 onCreateTracker = { navController.navigate(Routes.editor()) },
+                themePrefs = themePrefs,
             )
         }
         composable(
