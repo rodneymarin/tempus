@@ -59,7 +59,7 @@ fun DashboardScreen(
             if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
                 viewModel.undoLastLog()
             } else {
-                viewModel.undoLastLog() // clear pending state either way
+                viewModel.clearLastLog()
             }
         }
     }

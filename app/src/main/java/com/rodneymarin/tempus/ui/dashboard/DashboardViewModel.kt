@@ -72,6 +72,10 @@ class DashboardViewModel(private val repo: TrackersRepository) : ViewModel() {
         _lastLog.value = null
     }
 
+    fun clearLastLog() {
+        _lastLog.value = null
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
