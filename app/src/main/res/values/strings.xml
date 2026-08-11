@@ -51,4 +51,8 @@
     <string name="delete_log_confirm">¿Eliminar este registro?</string>
     <string name="delete_tracker_confirm">¿Eliminar «%1$s» y todo su historial?</string>
     <string name="delete_confirm_action">Eliminar</string>
+    <string name="unit_day">por día</string>
+    <string name="unit_week">por semana</string>
+    <string name="unit_month">por mes</string>
+    <string name="history_empty">Sin registros aún</string>
 </resources>
