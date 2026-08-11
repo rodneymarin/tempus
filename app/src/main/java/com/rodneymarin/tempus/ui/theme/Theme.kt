@@ -8,16 +8,16 @@ import androidx.compose.runtime.Composable
 import com.rodneymarin.tempus.ui.theme.ThemeMode
 
 private val LightColors = lightColorScheme(
-    primary = TealPrimary,
-    onPrimary = TealOnPrimary,
-    primaryContainer = TealPrimaryContainer,
-    onPrimaryContainer = TealOnPrimaryContainer,
+    primary = TempusPrimary,
+    onPrimary = TempusOnPrimary,
+    primaryContainer = TempusPrimaryContainer,
+    onPrimaryContainer = TempusOnPrimaryContainer,
 )
 private val DarkColors = darkColorScheme(
-    primary = TealDarkPrimary,
-    onPrimary = TealDarkOnPrimary,
-    primaryContainer = TealDarkPrimaryContainer,
-    onPrimaryContainer = TealDarkOnPrimaryContainer,
+    primary = TempusDarkPrimary,
+    onPrimary = TempusDarkOnPrimary,
+    primaryContainer = TempusDarkPrimaryContainer,
+    onPrimaryContainer = TempusDarkOnPrimaryContainer,
 )
 
 @Composable
