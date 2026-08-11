@@ -97,7 +97,7 @@ fun DashboardScreen(
         } else {
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxSize().padding(padding),
             ) {
                 items(rows, key = { it.tracker.id }) { row ->
