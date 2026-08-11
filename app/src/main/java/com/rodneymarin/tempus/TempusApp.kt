@@ -20,3 +20,7 @@ class AppContainer(context: Context) {
     val database: TempusDatabase = RoomBuilder.build(context)
     val repository: TrackersRepository = TrackersRepository(database)
 }
+
+fun androidx.lifecycle.viewmodel.CreationExtras.appContainer(): AppContainer =
+    (this[androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as TempusApp).container
+
