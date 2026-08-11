@@ -7,11 +7,15 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import com.rodneymarin.tempus.ui.theme.ThemeMode
 
+import androidx.compose.ui.graphics.Color
+
 private val LightColors = lightColorScheme(
     primary = TempusPrimary,
     onPrimary = TempusOnPrimary,
     primaryContainer = TempusPrimaryContainer,
     onPrimaryContainer = TempusOnPrimaryContainer,
+    background = Color.White,
+    surface = Color.White,
 )
 private val DarkColors = darkColorScheme(
     primary = TempusDarkPrimary,
