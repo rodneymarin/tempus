@@ -10,16 +10,17 @@ class StatsCalculatorTest {
     private val today: LocalDate = LocalDate.of(2026, 8, 10) // Monday
     private fun log(epochDay: Long) = LogEntry(id = 0, trackerId = 0, epochDay = epochDay)
     private fun day(y: Int, m: Int, d: Int) = LocalDate.of(y, m, d).toEpochDay()
+    private fun date(y: Int, m: Int, d: Int) = LocalDate.of(y, m, d)
 
     // ---- period boundaries ----
 
     @Test fun weekStart_isMonday() {
-        assertEquals(LocalDate.of(2026, 8, 10), StatsCalculator.periodStart(day(2026, 8, 10), FrequencyPeriod.WEEK))
-        assertEquals(LocalDate.of(2026, 8, 10), StatsCalculator.periodStart(day(2026, 8, 14), FrequencyPeriod.WEEK))
+        assertEquals(LocalDate.of(2026, 8, 10), StatsCalculator.periodStart(date(2026, 8, 10), FrequencyPeriod.WEEK))
+        assertEquals(LocalDate.of(2026, 8, 10), StatsCalculator.periodStart(date(2026, 8, 14), FrequencyPeriod.WEEK))
     }
 
     @Test fun weekEnd_isSunday() {
-        assertEquals(LocalDate.of(2026, 8, 16), StatsCalculator.periodEnd(day(2026, 8, 12), FrequencyPeriod.WEEK))
+        assertEquals(LocalDate.of(2026, 8, 16), StatsCalculator.periodEnd(date(2026, 8, 12), FrequencyPeriod.WEEK))
     }
 
     @Test fun monthBoundaries() {
@@ -58,8 +59,12 @@ class StatsCalculatorTest {
 
     @Test fun fridayThreeLogs_ofThreeToFive_isOnTrack() {
         // Friday 2026-08-14: elapsed 5/7 → projected 3/(5/7)=4.2 → 4 ∈ [3,5]
+        val friday = LocalDate.of(2026, 8, 14)
         val t = tracker(3, 5)
-        val s = status(listOf(log(day(2026, 8, 14)), log(day(2026, 8, 14)), log(day(2026, 8, 14))), t)
+        val s = StatsCalculator.statusFor(
+            listOf(log(day(2026, 8, 14)), log(day(2026, 8, 14)), log(day(2026, 8, 14))),
+            t.first, t.second, t.third, friday
+        )
         assertEquals(StatsCalculator.Status.ON_TRACK, s.status)
         assertEquals(4, s.projected)
     }
@@ -71,8 +76,12 @@ class StatsCalculatorTest {
     }
 
     @Test fun minOnly_oneLogFriday_isLow() {
+        val friday = LocalDate.of(2026, 8, 14)
         val t = tracker(3, null)
-        val s = status(listOf(log(day(2026, 8, 14))), t)
+        val s = StatsCalculator.statusFor(
+            listOf(log(day(2026, 8, 14))),
+            t.first, t.second, t.third, friday
+        )
         assertEquals(StatsCalculator.Status.LOW, s.status)
     }
 

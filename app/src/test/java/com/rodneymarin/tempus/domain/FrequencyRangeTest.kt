@@ -39,4 +39,14 @@ class FrequencyRangeTest {
     @Test fun nonNumeric_invalid() {
         assertTrue(FrequencyRange.parse("abc", "") is Result.InvalidNumber)
     }
+
+    @Test fun summary_noRange_returnsDash() {
+        assertEquals("—", FrequencyRange.summary(null, null))
+    }
+
+    @Test fun summary_minAndMax_returnsRange() {
+        assertEquals("3–5", FrequencyRange.summary(3, 5))
+        assertEquals("al menos 3", FrequencyRange.summary(3, null))
+        assertEquals("máximo 5", FrequencyRange.summary(null, 5))
+    }
 }
