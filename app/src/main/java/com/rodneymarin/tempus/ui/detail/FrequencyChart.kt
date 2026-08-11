@@ -69,7 +69,7 @@ fun FrequencyChart(
             val yMin = yFor(min).coerceIn(chartTop, chartBottom)
             val yMax = yFor(max).coerceIn(chartTop, chartBottom)
             drawRect(
-                color = rangeColor.copy(alpha = 0.10f),
+                color = rangeColor.copy(alpha = 0.20f),
                 topLeft = Offset(leftPad, yMin),
                 size = Size(chartW, (yMax - yMin).coerceAtLeast(0f)),
             )
