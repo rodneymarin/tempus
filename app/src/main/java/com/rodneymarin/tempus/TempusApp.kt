@@ -2,6 +2,9 @@ package com.rodneymarin.tempus
 
 import android.app.Application
 import android.content.Context
+import com.rodneymarin.tempus.data.RoomBuilder
+import com.rodneymarin.tempus.data.TempusDatabase
+import com.rodneymarin.tempus.data.TrackersRepository
 
 class TempusApp : Application() {
     lateinit var container: AppContainer
@@ -14,5 +17,6 @@ class TempusApp : Application() {
 }
 
 class AppContainer(context: Context) {
-    // Stubs — completed in Phase 1
+    val database: TempusDatabase = RoomBuilder.build(context)
+    val repository: TrackersRepository = TrackersRepository(database)
 }
