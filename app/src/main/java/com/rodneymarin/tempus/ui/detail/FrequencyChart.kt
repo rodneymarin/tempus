@@ -31,7 +31,7 @@ fun FrequencyChart(
 ) {
     val textMeasurer = rememberTextMeasurer()
     val barColor = MaterialTheme.colorScheme.primary
-    val bandColor = MaterialTheme.colorScheme.tertiaryContainer
+    val rangeColor = MaterialTheme.colorScheme.primary
     val gridColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
     val labelStyle: TextStyle = MaterialTheme.typography.labelSmall.copy(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -64,24 +64,25 @@ fun FrequencyChart(
             )
         }
 
-        // expected band + dashed bound lines
+        // expected range: very translucent fill + dashed boundary lines
         if (min != null && max != null) {
             val yMin = yFor(min).coerceIn(chartTop, chartBottom)
             val yMax = yFor(max).coerceIn(chartTop, chartBottom)
             drawRect(
-                color = bandColor.copy(alpha = 0.35f),
+                color = rangeColor.copy(alpha = 0.10f),
                 topLeft = Offset(leftPad, yMin),
                 size = Size(chartW, (yMax - yMin).coerceAtLeast(0f)),
             )
         }
+
         val dash = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))
         if (min != null) {
             val y = yFor(min).coerceIn(chartTop, chartBottom)
-            drawLine(bandColor, Offset(leftPad, y), Offset(size.width - rightPad, y), 2.dp.toPx(), pathEffect = dash)
+            drawLine(rangeColor, Offset(leftPad, y), Offset(size.width - rightPad, y), 2.dp.toPx(), pathEffect = dash)
         }
         if (max != null) {
             val y = yFor(max).coerceIn(chartTop, chartBottom)
-            drawLine(bandColor, Offset(leftPad, y), Offset(size.width - rightPad, y), 2.dp.toPx(), pathEffect = dash)
+            drawLine(rangeColor, Offset(leftPad, y), Offset(size.width - rightPad, y), 2.dp.toPx(), pathEffect = dash)
         }
 
         // bars + staggered x labels
@@ -98,7 +99,6 @@ fun FrequencyChart(
             // label only every Nth point to prevent overlap
             if (i % showEvery == 0) {
                 val layout = textMeasurer.measure(p.label, labelStyle)
-                // center under the bar, allow slight overflow at edges
                 val x = cx - layout.size.width / 2f
                 drawText(layout, topLeft = Offset(x, chartBottom + 6.dp.toPx()))
             }
