@@ -169,21 +169,23 @@ fun TrackerDetailScreen(
             }
 
             // Chart
-            SectionTitle(stringResource(R.string.chart_title))
-            ui.status?.let { st ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    StatusChip(st.status)
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        when (st.status) {
-                            Status.ON_TRACK -> stringResource(R.string.move_to_on_track)
-                            Status.LOW -> stringResource(R.string.move_to_low)
-                            Status.HIGH -> stringResource(R.string.move_to_high)
-                            Status.NO_RANGE -> ""
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = statusHintColor(st.status),
-                    )
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                SectionTitle(stringResource(R.string.chart_title))
+                ui.status?.let { st ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        StatusChip(st.status)
+                        Spacer(Modifier.size(8.dp))
+                        Text(
+                            when (st.status) {
+                                Status.ON_TRACK -> stringResource(R.string.move_to_on_track)
+                                Status.LOW -> stringResource(R.string.move_to_low)
+                                Status.HIGH -> stringResource(R.string.move_to_high)
+                                Status.NO_RANGE -> ""
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = statusHintColor(st.status),
+                        )
+                    }
                 }
             }
             FrequencyChart(
@@ -260,7 +262,7 @@ private fun SectionTitle(text: String) {
     Text(
         text,
         style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(top = 8.dp),
+        modifier = Modifier.padding(top = 4.dp),
     )
 }
 
