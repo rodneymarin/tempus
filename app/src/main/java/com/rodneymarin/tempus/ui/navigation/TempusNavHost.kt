@@ -1,5 +1,8 @@
 package com.rodneymarin.tempus.ui.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -19,7 +22,13 @@ fun TempusNavHost(
     val app = androidx.compose.ui.platform.LocalContext.current.applicationContext as TempusApp
     val themePrefs = app.container.themePrefs
     NavHost(navController = navController, startDestination = Routes.DASHBOARD) {
-        composable(Routes.DASHBOARD) {
+        composable(
+            Routes.DASHBOARD,
+            enterTransition = { slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(300)) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(300)) },
+            popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(300)) },
+            popExitTransition = { slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(300)) },
+        ) {
             DashboardScreen(
                 onOpenTracker = { id -> navController.navigate(Routes.detail(id)) },
                 onCreateTracker = { navController.navigate(Routes.editor()) },
@@ -29,6 +38,10 @@ fun TempusNavHost(
         composable(
             route = Routes.DETAIL,
             arguments = listOf(navArgument("trackerId") { type = NavType.LongType }),
+            enterTransition = { slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(300)) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(300)) },
+            popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(300)) },
+            popExitTransition = { slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(300)) },
         ) { entry ->
             val trackerId = entry.arguments?.getLong("trackerId") ?: return@composable
             TrackerDetailScreen(
@@ -43,6 +56,10 @@ fun TempusNavHost(
                 type = NavType.LongType
                 defaultValue = -1L
             }),
+            enterTransition = { slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(300)) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(300)) },
+            popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(300)) },
+            popExitTransition = { slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(300)) },
         ) { entry ->
             val trackerId = entry.arguments?.getLong("trackerId")?.takeIf { it > 0 }
             TrackerEditorScreen(
