@@ -147,23 +147,6 @@ fun TrackerDetailScreen(
                     )
                 }
             }
-            // Status row
-            ui.status?.let { st ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    StatusChip(st.status)
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        when (st.status) {
-                            Status.ON_TRACK -> stringResource(R.string.move_to_on_track)
-                            Status.LOW -> stringResource(R.string.move_to_low)
-                            Status.HIGH -> stringResource(R.string.move_to_high)
-                            Status.NO_RANGE -> ""
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = statusHintColor(st.status),
-                    )
-                }
-            }
 
             // Actions
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -187,6 +170,22 @@ fun TrackerDetailScreen(
 
             // Chart
             SectionTitle(stringResource(R.string.chart_title))
+            ui.status?.let { st ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    StatusChip(st.status)
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        when (st.status) {
+                            Status.ON_TRACK -> stringResource(R.string.move_to_on_track)
+                            Status.LOW -> stringResource(R.string.move_to_low)
+                            Status.HIGH -> stringResource(R.string.move_to_high)
+                            Status.NO_RANGE -> ""
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = statusHintColor(st.status),
+                    )
+                }
+            }
             FrequencyChart(
                 points = ui.periodPoints,
                 min = tracker.minFrequency,
