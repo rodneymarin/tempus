@@ -71,7 +71,7 @@ fun FrequencyChart(
             val topY = kotlin.math.min(yMin, yMax)
             val bandH = kotlin.math.abs(yMax - yMin)
             drawRect(
-                color = rangeColor.copy(alpha = 0.35f),
+                color = rangeColor.copy(alpha = 0.08f),
                 topLeft = Offset(leftPad, topY),
                 size = Size(chartW, bandH),
             )
