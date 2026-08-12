@@ -149,32 +149,41 @@ fun TrackerDetailScreen(
             }
             // Status row
             ui.status?.let { st ->
-                StatusChip(st.status)
-                Text(
-                    when (st.status) {
-                        Status.ON_TRACK -> stringResource(R.string.move_to_on_track)
-                        Status.LOW -> stringResource(R.string.move_to_low)
-                        Status.HIGH -> stringResource(R.string.move_to_high)
-                        Status.NO_RANGE -> ""
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = statusHintColor(st.status),
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    StatusChip(st.status)
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        when (st.status) {
+                            Status.ON_TRACK -> stringResource(R.string.move_to_on_track)
+                            Status.LOW -> stringResource(R.string.move_to_low)
+                            Status.HIGH -> stringResource(R.string.move_to_high)
+                            Status.NO_RANGE -> ""
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = statusHintColor(st.status),
+                    )
+                }
             }
 
             // Actions
-            Button(
-                onClick = viewModel::logToday,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-            ) {
-                Icon(Icons.Default.Add, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.log_today))
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = viewModel::logToday,
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    Spacer(Modifier.size(8.dp))
+                    Text(stringResource(R.string.log_today))
+                }
+                OutlinedButton(
+                    onClick = { showSheet = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.30f),
+                    ),
+                ) { Text(stringResource(R.string.log_another_day)) }
             }
-            OutlinedButton(
-                onClick = { showSheet = true },
-                modifier = Modifier.fillMaxWidth(),
-            ) { Text(stringResource(R.string.log_another_day)) }
 
             // Chart
             SectionTitle(stringResource(R.string.chart_title))

@@ -38,7 +38,7 @@ fun FrequencyChart(
         fontSize = 10.sp,
     )
 
-    Canvas(modifier = modifier.fillMaxWidth().height(220.dp)) {
+    Canvas(modifier = modifier.fillMaxWidth().height(180.dp)) {
         if (points.isEmpty()) return@Canvas
 
         val maxVal = maxOf(points.maxOf { it.count }, max ?: 0, min ?: 0, 1)
