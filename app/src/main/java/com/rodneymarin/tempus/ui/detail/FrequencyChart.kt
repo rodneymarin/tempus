@@ -64,14 +64,16 @@ fun FrequencyChart(
             )
         }
 
-        // expected range: very translucent fill + dashed boundary lines
+        // expected range: translucent fill + dashed boundary lines
         if (min != null && max != null) {
             val yMin = yFor(min).coerceIn(chartTop, chartBottom)
             val yMax = yFor(max).coerceIn(chartTop, chartBottom)
+            val topY = kotlin.math.min(yMin, yMax)
+            val bandH = kotlin.math.abs(yMax - yMin)
             drawRect(
-                color = rangeColor.copy(alpha = 0.50f),
-                topLeft = Offset(leftPad, yMin),
-                size = Size(chartW, (yMax - yMin).coerceAtLeast(0f)),
+                color = rangeColor.copy(alpha = 0.35f),
+                topLeft = Offset(leftPad, topY),
+                size = Size(chartW, bandH),
             )
         }
 
