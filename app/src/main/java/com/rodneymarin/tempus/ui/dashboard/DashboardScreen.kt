@@ -104,7 +104,6 @@ fun DashboardScreen(
                     TrackerCard(
                         row = row,
                         onOpen = { onOpenTracker(row.tracker.id) },
-                        onLogToday = { viewModel.logToday(row.tracker.id) },
                     )
                 }
             }
