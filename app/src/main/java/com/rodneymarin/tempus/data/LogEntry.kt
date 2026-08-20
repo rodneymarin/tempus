@@ -13,7 +13,11 @@ import androidx.room.PrimaryKey
         childColumns = ["trackerId"],
         onDelete = ForeignKey.CASCADE,
     )],
-    indices = [Index("trackerId"), Index("epochDay")],
+    indices = [
+        Index("trackerId"),
+        Index("epochDay"),
+        Index(value = ["trackerId", "epochDay"], unique = true),
+    ],
 )
 data class LogEntry(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

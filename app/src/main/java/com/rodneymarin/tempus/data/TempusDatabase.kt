@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [Tracker::class, LogEntry::class], version = 1, exportSchema = true)
+@Database(entities = [Tracker::class, LogEntry::class], version = 2, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TempusDatabase : RoomDatabase() {
     abstract fun trackerDao(): TrackerDao
@@ -15,5 +15,7 @@ abstract class TempusDatabase : RoomDatabase() {
 
 object RoomBuilder {
     fun build(context: Context): TempusDatabase =
-        Room.databaseBuilder(context, TempusDatabase::class.java, "tempus.db").build()
+        Room.databaseBuilder(context, TempusDatabase::class.java, "tempus.db")
+            .addMigrations(MIGRATION_1_2)
+            .build()
 }

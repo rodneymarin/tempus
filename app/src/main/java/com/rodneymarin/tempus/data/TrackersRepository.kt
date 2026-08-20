@@ -26,4 +26,6 @@ class TrackersRepository(private val db: TempusDatabase) {
         logDao.insert(LogEntry(trackerId = trackerId, epochDay = epochDay, timeMinutes = timeMinutes))
 
     suspend fun deleteLog(id: Long) = logDao.deleteById(id)
+
+    suspend fun deleteLogsForDay(trackerId: Long, epochDay: Long) = logDao.deleteByDay(trackerId, epochDay)
 }

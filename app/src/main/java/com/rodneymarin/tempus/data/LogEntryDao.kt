@@ -2,6 +2,7 @@ package com.rodneymarin.tempus.data
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
@@ -13,8 +14,11 @@ interface LogEntryDao {
     @Query("SELECT * FROM log_entries")
     fun observeAll(): Flow<List<LogEntry>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: LogEntry): Long
+
+    @Query("DELETE FROM log_entries WHERE trackerId = :trackerId AND epochDay = :epochDay")
+    suspend fun deleteByDay(trackerId: Long, epochDay: Long)
 
     @Query("DELETE FROM log_entries WHERE id = :id")
     suspend fun deleteById(id: Long)
