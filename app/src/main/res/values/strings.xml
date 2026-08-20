@@ -24,6 +24,9 @@
     <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
     <string name="log_today">Sucedió hoy</string>
+    <string name="log_today_done">Ya se registró hoy</string>
+    <string name="register_day_confirm">¿Registrar evento el día %1$s?</string>
+    <string name="delete_day_confirm">Este día ya tiene un evento registrado. ¿Deseas eliminarlo?</string>
     <string name="log_registered">Registrado</string>
     <string name="undo">Deshacer</string>
     <string name="log_another_day">Registrar día manual</string>

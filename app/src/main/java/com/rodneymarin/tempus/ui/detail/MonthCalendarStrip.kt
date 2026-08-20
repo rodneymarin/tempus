@@ -1,6 +1,7 @@
 package com.rodneymarin.tempus.ui.detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ private val localeEs = Locale("es")
 fun MonthCalendarStrip(
     daysWithEvent: Set<LocalDate>,
     today: LocalDate,
+    onDayClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val startDate = today.minusDays(29)
@@ -95,6 +97,7 @@ fun MonthCalendarStrip(
                                         .weight(1f)
                                         .aspectRatio(1f)
                                         .clip(RoundedCornerShape(10.dp))
+                                        .then(if (isInRange) Modifier.clickable { onDayClick(cellDate) } else Modifier)
                                         .background(bgColor)
                                         .padding(4.dp),
                                     contentAlignment = Alignment.BottomCenter,

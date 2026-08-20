@@ -57,6 +57,8 @@ import com.rodneymarin.tempus.ui.theme.StatusAmber
 import com.rodneymarin.tempus.ui.theme.StatusGreen
 import com.rodneymarin.tempus.ui.theme.StatusRed
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +74,8 @@ fun TrackerDetailScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var showSheet by remember { mutableStateOf(false) }
     var logToDelete by remember { mutableStateOf<LogEntry?>(null) }
+    var registerDay by remember { mutableStateOf<LocalDate?>(null) }
+    var deleteDay by remember { mutableStateOf<LocalDate?>(null) }
     var confirmDeleteTracker by remember { mutableStateOf(false) }
 
     val logRegisteredMsg = stringResource(R.string.log_registered)
@@ -93,6 +97,8 @@ fun TrackerDetailScreen(
 
     val tracker = ui.tracker
     val today = LocalDate.now()
+    val daysWithEvent = ui.dailyCounts.filterValues { it > 0 }.keys
+    val todayHasEvent = (ui.dailyCounts[today] ?: 0) > 0
     Scaffold(
         topBar = {
             TopAppBar(
@@ -158,11 +164,12 @@ fun TrackerDetailScreen(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = viewModel::logToday,
+                    enabled = !todayHasEvent,
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Spacer(Modifier.size(8.dp))
-                    Text(stringResource(R.string.log_today))
+                    Text(stringResource(if (todayHasEvent) R.string.log_today_done else R.string.log_today))
                 }
                 OutlinedButton(
                     onClick = { showSheet = true },
@@ -177,8 +184,11 @@ fun TrackerDetailScreen(
             // 30-day calendar
             SectionTitle(stringResource(R.string.heat_title))
             MonthCalendarStrip(
-                daysWithEvent = ui.dailyCounts.filterValues { it > 0 }.keys,
+                daysWithEvent = daysWithEvent,
                 today = today,
+                onDayClick = { day ->
+                    if (day in daysWithEvent) deleteDay = day else registerDay = day
+                },
             )
 
             // History
@@ -220,6 +230,40 @@ fun TrackerDetailScreen(
             },
             dismissButton = {
                 TextButton(onClick = { logToDelete = null }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
+
+    registerDay?.let { day ->
+        AlertDialog(
+            onDismissRequest = { registerDay = null },
+            title = { Text(stringResource(R.string.register_day_confirm, day.format(
+                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es"))
+            ))) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.logOn(day, null)
+                    registerDay = null
+                }) { Text(stringResource(R.string.register)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { registerDay = null }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
+
+    deleteDay?.let { day ->
+        AlertDialog(
+            onDismissRequest = { deleteDay = null },
+            title = { Text(stringResource(R.string.delete_day_confirm)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteDay(day)
+                    deleteDay = null
+                }) { Text(stringResource(R.string.delete_confirm_action)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteDay = null }) { Text(stringResource(R.string.cancel)) }
             },
         )
     }
