@@ -51,4 +51,23 @@ class TrackerDaoTest {
         assertEquals(200, logs[0].epochDay)
         assertEquals(100, logs[1].epochDay)
     }
+
+    @Test fun insertSameDayReplaces() = runBlocking {
+        val trackerId = db.trackerDao().insert(Tracker(name = "C"))
+        db.logEntryDao().insert(LogEntry(trackerId = trackerId, epochDay = 300, timeMinutes = 60))
+        val secondId = db.logEntryDao().insert(LogEntry(trackerId = trackerId, epochDay = 300, timeMinutes = 480))
+        val logs = db.logEntryDao().observeByTracker(trackerId).first()
+        assertEquals(1, logs.size)
+        assertEquals(480, logs[0].timeMinutes)
+        assertEquals(secondId, logs[0].id)
+    }
+
+    @Test fun deleteByDayRemovesOnlyThatDay() = runBlocking {
+        val trackerId = db.trackerDao().insert(Tracker(name = "D"))
+        db.logEntryDao().insert(LogEntry(trackerId = trackerId, epochDay = 400, timeMinutes = null))
+        db.logEntryDao().insert(LogEntry(trackerId = trackerId, epochDay = 401, timeMinutes = null))
+        db.logEntryDao().deleteByDay(trackerId, 400)
+        val logs = db.logEntryDao().observeByTracker(trackerId).first()
+        assertEquals(listOf(401L), logs.map { it.epochDay })
+    }
 }
