@@ -22,14 +22,12 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 
-data class DayGroup(val date: LocalDate, val entries: List<LogEntry>)
-
 data class DetailUiState(
     val tracker: Tracker? = null,
     val status: TrackStatus? = null,
     val periodPoints: List<PeriodPoint> = emptyList(),
     val dailyCounts: Map<LocalDate, Int> = emptyMap(),
-    val history: List<DayGroup> = emptyList(),
+    val history: List<LogEntry> = emptyList(),
 )
 
 data class LogConfirmation(val insertedId: Long)
@@ -52,10 +50,7 @@ class TrackerDetailViewModel(
                     StatsCalculator.lastPeriods(logs, it.period, today)
                 } ?: emptyList(),
                 dailyCounts = StatsCalculator.dailyCounts(logs, today = today),
-                history = logs
-                    .groupBy { LocalDate.ofEpochDay(it.epochDay) }
-                    .map { (date, entries) -> DayGroup(date, entries.sortedByDescending { it.timeMinutes }) }
-                    .sortedByDescending { it.date },
+                history = logs.sortedByDescending { it.epochDay },
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DetailUiState())
 

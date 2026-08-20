@@ -20,55 +20,52 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.rodneymarin.tempus.R
 import com.rodneymarin.tempus.data.LogEntry
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
 fun LogHistory(
-    groups: List<DayGroup>,
+    entries: List<LogEntry>,
     onDelete: (LogEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        groups.forEach { group ->
-            val header = group.date
+        entries.forEach { entry ->
+            val date = LocalDate.ofEpochDay(entry.epochDay)
+            val header = date
                 .format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es")))
                 .replaceFirstChar { it.uppercase() }
-            group.entries.forEach { entry ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
-                    ),
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
+                ),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                    ) {
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text(
-                                header,
-                                style = MaterialTheme.typography.titleSmall,
-                            )
-                            Text(
-                                entry.timeMinutes?.let { minutes ->
-                                    LocalTime.of(minutes / 60, minutes % 60)
-                                        .format(DateTimeFormatter.ofPattern("h:mm a", Locale("es")))
-                                } ?: stringResource(R.string.no_time),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        IconButton(onClick = { onDelete(entry) }) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = stringResource(R.string.delete),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(header, style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            entry.timeMinutes?.let { minutes ->
+                                LocalTime.of(minutes / 60, minutes % 60)
+                                    .format(DateTimeFormatter.ofPattern("h:mm a", Locale("es")))
+                            } ?: stringResource(R.string.no_time),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    IconButton(onClick = { onDelete(entry) }) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
             }

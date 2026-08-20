@@ -200,7 +200,7 @@ fun TrackerDetailScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                LogHistory(groups = ui.history, onDelete = { logToDelete = it })
+                LogHistory(entries = ui.history, onDelete = { logToDelete = it })
             }
             Spacer(Modifier.height(12.dp))
         }
