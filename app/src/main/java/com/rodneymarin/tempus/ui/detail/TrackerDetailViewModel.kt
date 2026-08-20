@@ -84,8 +84,11 @@ class TrackerDetailViewModel(
 
     fun deleteLog(id: Long) = viewModelScope.launch { repo.deleteLog(id) }
 
-    fun deleteDay(date: LocalDate) = viewModelScope.launch {
-        repo.deleteLogsForDay(trackerId, date.toEpochDay())
+    fun deleteDay(date: LocalDate) {
+        _lastLog.value = null
+        viewModelScope.launch {
+            repo.deleteLogsForDay(trackerId, date.toEpochDay())
+        }
     }
 
     fun deleteTracker() {

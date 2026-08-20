@@ -77,6 +77,7 @@ fun TrackerDetailScreen(
     var registerDay by remember { mutableStateOf<LocalDate?>(null) }
     var deleteDay by remember { mutableStateOf<LocalDate?>(null) }
     var confirmDeleteTracker by remember { mutableStateOf(false) }
+    val dayFormatter = remember { DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es")) }
 
     val logRegisteredMsg = stringResource(R.string.log_registered)
     val undoLabel = stringResource(R.string.undo)
@@ -238,9 +239,7 @@ fun TrackerDetailScreen(
     registerDay?.let { day ->
         AlertDialog(
             onDismissRequest = { registerDay = null },
-            title = { Text(stringResource(R.string.register_day_confirm, day.format(
-                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es"))
-            ))) },
+            title = { Text(stringResource(R.string.register_day_confirm, day.format(dayFormatter))) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.logOn(day, null)

@@ -27,10 +27,10 @@ class MigrationTest {
                     "VALUES (1, 'A', 'x', NULL, NULL, 'WEEK', 0)"
             )
             db.execSQL(
-                "INSERT INTO log_entries (id, trackerId, epochDay, timeMinutes) VALUES (1, 1, 20000, NULL)"
+                "INSERT INTO log_entries (id, trackerId, epochDay, timeMinutes) VALUES (1, 1, 20000, 480)"
             )
             db.execSQL(
-                "INSERT INTO log_entries (id, trackerId, epochDay, timeMinutes) VALUES (2, 1, 20000, 480)"
+                "INSERT INTO log_entries (id, trackerId, epochDay, timeMinutes) VALUES (2, 1, 20000, NULL)"
             )
             db.execSQL(
                 "INSERT INTO log_entries (id, trackerId, epochDay, timeMinutes) VALUES (3, 1, 20001, NULL)"
@@ -39,15 +39,16 @@ class MigrationTest {
 
         val db = helper.runMigrationsAndValidate("migration-test", 2, true, MIGRATION_1_2)
 
-        db.query("SELECT id, epochDay, timeMinutes FROM log_entries").use { c ->
+        db.query("SELECT id, epochDay, timeMinutes FROM log_entries ORDER BY id").use { c ->
             assertEquals(2, c.count)
             c.moveToFirst()
-            assertEquals(2, c.getLong(0))            // se conservó el id más alto del día 20000
+            assertEquals(2, c.getLong(0))            // se conserva MAX(id) del día 20000, no la mayor hora
             assertEquals(20000, c.getLong(1))
-            assertEquals(480, c.getLong(2))
+            org.junit.Assert.assertTrue(c.isNull(2)) // timeMinutes NULL en el sobreviviente
             c.moveToNext()
             assertEquals(3, c.getLong(0))
             assertEquals(20001, c.getLong(1))
+            org.junit.Assert.assertTrue(c.isNull(2))
         }
         db.close()
 
