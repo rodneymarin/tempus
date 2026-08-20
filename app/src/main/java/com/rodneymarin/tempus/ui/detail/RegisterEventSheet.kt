@@ -35,6 +35,7 @@ import java.time.ZoneOffset
 fun RegisterEventSheet(
     onDismiss: () -> Unit,
     onConfirm: (LocalDate, Int?) -> Unit,
+    daysWithEvent: Set<LocalDate>,
 ) {
     val today = LocalDate.now()
     var showDatePicker by remember { mutableStateOf(false) }
@@ -69,6 +70,17 @@ fun RegisterEventSheet(
         )
         if (showTime) {
             TimePicker(state = timeState)
+        }
+
+        if (selectedDate in daysWithEvent) {
+            val replacement = stringResource(
+                if (showTime) R.string.sheet_replaces_with_time else R.string.sheet_replaces_no_time
+            )
+            Text(
+                stringResource(R.string.sheet_has_event_warning, replacement),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
         }
 
         Button(

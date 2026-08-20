@@ -214,6 +214,7 @@ fun TrackerDetailScreen(
                     viewModel.logOn(date, timeMinutes)
                     showSheet = false
                 },
+                daysWithEvent = daysWithEvent,
             )
         }
     }

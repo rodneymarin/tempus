@@ -35,6 +35,9 @@
     <string name="add_time">Añadir hora</string>
     <string name="no_time">Sin hora</string>
     <string name="register">Registrar</string>
+    <string name="sheet_has_event_warning">Ya hay un evento registrado este día. Al confirmar se reemplazará su hora por %1$s.</string>
+    <string name="sheet_replaces_with_time">la hora seleccionada</string>
+    <string name="sheet_replaces_no_time">sin hora</string>
     <string name="status_on_track">En rango</string>
     <string name="status_low">Bajo</string>
     <string name="status_high">Alto</string>
