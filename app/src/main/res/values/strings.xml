@@ -26,13 +26,13 @@
     <string name="log_today">Sucedió hoy</string>
     <string name="log_registered">Registrado</string>
     <string name="undo">Deshacer</string>
-    <string name="log_another_day">Registrar otro día</string>
+    <string name="log_another_day">Registrar día manual</string>
     <string name="date_label">Fecha</string>
     <string name="time_label">Hora (opcional)</string>
     <string name="add_time">Añadir hora</string>
     <string name="no_time">Sin hora</string>
     <string name="register">Registrar</string>
-    <string name="status_on_track">En track</string>
+    <string name="status_on_track">En rango</string>
     <string name="status_low">Bajo</string>
     <string name="status_high">Alto</string>
     <string name="status_no_range">Sin rango</string>
@@ -55,6 +55,16 @@
     <string name="unit_week">por semana</string>
     <string name="unit_month">por mes</string>
     <string name="history_empty">Sin registros aún</string>
+    <string name="last_event_none">Sin eventos aún</string>
+    <string name="last_event_today">Último evento hoy</string>
+    <plurals name="last_event_days">
+        <item quantity="one">Último evento hace %d día</item>
+        <item quantity="other">Último evento hace %d días</item>
+    </plurals>
+    <plurals name="last_event_weeks">
+        <item quantity="one">Último evento hace %d semana</item>
+        <item quantity="other">Último evento hace %d semanas</item>
+    </plurals>
     <string name="menu">Menú</string>
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>

@@ -8,7 +8,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rodneymarin.tempus.TempusApp
 import com.rodneymarin.tempus.data.Tracker
 import com.rodneymarin.tempus.data.TrackersRepository
-import com.rodneymarin.tempus.domain.FrequencyRange
 import com.rodneymarin.tempus.domain.StatsCalculator
 import com.rodneymarin.tempus.domain.StatsCalculator.Status
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +21,7 @@ import java.time.LocalTime
 
 data class TrackerRow(
     val tracker: Tracker,
-    val countInPeriod: Int,
-    val expectedSummary: String,
+    val lastEventDay: LocalDate?,
     val status: Status,
 )
 
@@ -42,8 +40,7 @@ class DashboardViewModel(private val repo: TrackersRepository) : ViewModel() {
                 )
                 TrackerRow(
                     tracker = t,
-                    countInPeriod = status.count,
-                    expectedSummary = FrequencyRange.summary(t.minFrequency, t.maxFrequency),
+                    lastEventDay = trackerLogs.maxOfOrNull { it.epochDay }?.let(LocalDate::ofEpochDay),
                     status = status.status,
                 )
             }

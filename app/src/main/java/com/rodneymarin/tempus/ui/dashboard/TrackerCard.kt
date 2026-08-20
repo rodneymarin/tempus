@@ -16,12 +16,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rodneymarin.tempus.R
-import com.rodneymarin.tempus.data.Tracker
-import com.rodneymarin.tempus.domain.FrequencyPeriod
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @Composable
 fun TrackerCard(
@@ -55,7 +56,7 @@ fun TrackerCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    periodSummary(row.tracker, row.countInPeriod, row.expectedSummary),
+                    lastEventSummary(row.lastEventDay),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -68,16 +69,27 @@ fun TrackerCard(
 }
 
 @Composable
-private fun periodSummary(tracker: Tracker, count: Int, expected: String): String {
-    val prefix = when (tracker.period) {
-        FrequencyPeriod.DAY -> stringResource(R.string.period_prefix_day)
-        FrequencyPeriod.WEEK -> stringResource(R.string.period_prefix_week)
-        FrequencyPeriod.MONTH -> stringResource(R.string.period_prefix_month)
+private fun lastEventSummary(lastEventDay: LocalDate?): String {
+    val info = lastEventInfo(lastEventDay, LocalDate.now())
+    return when (info.kind) {
+        LastEventKind.NONE -> stringResource(R.string.last_event_none)
+        LastEventKind.TODAY -> stringResource(R.string.last_event_today)
+        LastEventKind.DAYS -> pluralStringResource(R.plurals.last_event_days, info.amount, info.amount)
+        LastEventKind.WEEKS -> pluralStringResource(R.plurals.last_event_weeks, info.amount, info.amount)
     }
-    val hasRange = tracker.minFrequency != null || tracker.maxFrequency != null
-    return if (hasRange) {
-        stringResource(R.string.this_period_count_range, prefix, count, expected)
-    } else {
-        stringResource(R.string.this_period_count, prefix, count)
+}
+
+internal enum class LastEventKind { NONE, TODAY, DAYS, WEEKS }
+
+internal data class LastEventInfo(val kind: LastEventKind, val amount: Int)
+
+/** Clasifica la antigüedad del último evento: <7 días se expresa en días, >=7 en semanas. */
+internal fun lastEventInfo(lastEventDay: LocalDate?, today: LocalDate): LastEventInfo {
+    if (lastEventDay == null) return LastEventInfo(LastEventKind.NONE, 0)
+    val days = ChronoUnit.DAYS.between(lastEventDay, today)
+    return when {
+        days <= 0 -> LastEventInfo(LastEventKind.TODAY, 0)
+        days < 7 -> LastEventInfo(LastEventKind.DAYS, days.toInt())
+        else -> LastEventInfo(LastEventKind.WEEKS, (days / 7).toInt())
     }
 }

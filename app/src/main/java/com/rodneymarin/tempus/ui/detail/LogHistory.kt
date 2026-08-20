@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.rodneymarin.tempus.R
 import com.rodneymarin.tempus.data.LogEntry
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -32,29 +35,40 @@ fun LogHistory(
             val header = group.date
                 .format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es")))
                 .replaceFirstChar { it.uppercase() }
-            Text(
-                header,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 4.dp),
-            )
             group.entries.forEach { entry ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
+                    ),
                 ) {
-                    Text(
-                        entry.timeMinutes?.let { "%02d:%02d".format(it / 60, it % 60) }
-                            ?: stringResource(R.string.no_time),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f),
-                    )
-                    IconButton(onClick = { onDelete(entry) }) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = stringResource(R.string.delete),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                    ) {
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(
+                                header,
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                            Text(
+                                entry.timeMinutes?.let { minutes ->
+                                    LocalTime.of(minutes / 60, minutes % 60)
+                                        .format(DateTimeFormatter.ofPattern("h:mm a", Locale("es")))
+                                } ?: stringResource(R.string.no_time),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        IconButton(onClick = { onDelete(entry) }) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = stringResource(R.string.delete),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
             }

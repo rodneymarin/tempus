@@ -56,6 +56,7 @@ import com.rodneymarin.tempus.ui.dashboard.StatusChip
 import com.rodneymarin.tempus.ui.theme.StatusAmber
 import com.rodneymarin.tempus.ui.theme.StatusGreen
 import com.rodneymarin.tempus.ui.theme.StatusRed
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +92,7 @@ fun TrackerDetailScreen(
     }
 
     val tracker = ui.tracker
+    val today = LocalDate.now()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -122,10 +124,11 @@ fun TrackerDetailScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 16.dp),
         ) {
-            // Header
+            // Header with status inline
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Box(
                     Modifier.size(56.dp),
@@ -133,7 +136,7 @@ fun TrackerDetailScreen(
                 ) {
                     Text(tracker.emoji, style = MaterialTheme.typography.displaySmall)
                 }
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(tracker.name, style = MaterialTheme.typography.headlineSmall)
                     Text(
                         stringResource(
@@ -145,6 +148,9 @@ fun TrackerDetailScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                }
+                ui.status?.let { st ->
+                    StatusChip(st.status)
                 }
             }
 
@@ -168,35 +174,12 @@ fun TrackerDetailScreen(
                 ) { Text(stringResource(R.string.log_another_day)) }
             }
 
-            // Chart
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                SectionTitle(stringResource(R.string.chart_title))
-                ui.status?.let { st ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        StatusChip(st.status)
-                        Spacer(Modifier.size(8.dp))
-                        Text(
-                            when (st.status) {
-                                Status.ON_TRACK -> stringResource(R.string.move_to_on_track)
-                                Status.LOW -> stringResource(R.string.move_to_low)
-                                Status.HIGH -> stringResource(R.string.move_to_high)
-                                Status.NO_RANGE -> ""
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                            color = statusHintColor(st.status),
-                        )
-                    }
-                }
-            }
-            FrequencyChart(
-                points = ui.periodPoints,
-                min = tracker.minFrequency,
-                max = tracker.maxFrequency,
-            )
-
-            // Heat strip
+            // 30-day calendar
             SectionTitle(stringResource(R.string.heat_title))
-            HeatStrip(counts = ui.dailyCounts, today = java.time.LocalDate.now())
+            MonthCalendarStrip(
+                daysWithEvent = ui.dailyCounts.filterValues { it > 0 }.keys,
+                today = today,
+            )
 
             // History
             SectionTitle(stringResource(R.string.history_title))
@@ -274,11 +257,3 @@ private fun unitLabel(period: FrequencyPeriod): String = stringResource(
         FrequencyPeriod.MONTH -> R.string.unit_month
     }
 )
-
-@Composable
-private fun statusHintColor(status: Status): Color = when (status) {
-    Status.ON_TRACK -> StatusGreen
-    Status.LOW -> StatusAmber
-    Status.HIGH -> StatusRed
-    Status.NO_RANGE -> MaterialTheme.colorScheme.onSurfaceVariant
-}
