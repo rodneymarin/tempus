@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [Tracker::class, LogEntry::class], version = 1, exportSchema = false)
+@Database(entities = [Tracker::class, LogEntry::class], version = 1, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TempusDatabase : RoomDatabase() {
     abstract fun trackerDao(): TrackerDao
