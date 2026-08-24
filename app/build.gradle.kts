@@ -33,6 +33,13 @@ android {
     sourceSets {
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
+
+    lint {
+        // lifecycle-lint 2.9.0 crashea con Kotlin 2.1.10 (IncompatibleClassChangeError
+        // en NonNullableMutableLiveDataDetector). Detector deshabilitado hasta que
+        // lifecycle publique una versión compatible.
+        disable += "NullSafeMutableLiveData"
+    }
 }
 
 ksp {
