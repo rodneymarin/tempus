@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -103,13 +103,15 @@ fun DashboardScreen(
         } else {
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
                 modifier = Modifier.fillMaxSize().padding(padding),
             ) {
-                items(rows, key = { it.tracker.id }) { row ->
+                itemsIndexed(rows, key = { _, row -> row.tracker.id }) { index, row ->
                     TrackerCard(
                         row = row,
                         onOpen = { onOpenTracker(row.tracker.id) },
+                        index = index,
+                        count = rows.size,
                     )
                 }
             }

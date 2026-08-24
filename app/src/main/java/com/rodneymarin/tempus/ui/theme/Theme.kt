@@ -8,7 +8,6 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.rodneymarin.tempus.ui.theme.ThemeMode
 
@@ -17,8 +16,8 @@ private val LightColors = lightColorScheme(
     onPrimary = TempusOnPrimary,
     primaryContainer = TempusPrimaryContainer,
     onPrimaryContainer = TempusOnPrimaryContainer,
-    background = Color.White,
-    surface = Color.White,
+    background = TempusLightBackground,
+    surface = TempusLightBackground,
 )
 private val DarkColors = darkColorScheme(
     primary = TempusDarkPrimary,
@@ -41,8 +40,11 @@ fun TempusTheme(
     val colorScheme = when {
         // Dynamic Color (Material You) — takes the accent from the user's wallpaper.
         // Requires Android 12+; falls back to the custom palette otherwise.
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val base = if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            // Fondo ligeramente gris en claro para contraste con las cards blancas
+            if (darkTheme) base else base.copy(background = TempusLightBackground, surface = TempusLightBackground)
+        }
         else -> if (darkTheme) DarkColors else LightColors
     }
     MaterialTheme(

@@ -29,10 +29,13 @@ fun TrackerCard(
     row: TrackerRow,
     onOpen: () -> Unit,
     modifier: Modifier = Modifier,
+    index: Int = 0,
+    count: Int = 1,
 ) {
     TempusComponents.TempusCard(
         onClick = onOpen,
         modifier = modifier.fillMaxWidth(),
+        shape = TempusComponents.listItemShape(index, count),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -40,10 +43,12 @@ fun TrackerCard(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             Box(
-                Modifier.size(44.dp).background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+                Modifier
+                    .size(52.dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(row.tracker.emoji, style = MaterialTheme.typography.titleLarge)
+                Text(row.tracker.emoji, style = MaterialTheme.typography.headlineMedium)
             }
             Column(Modifier.weight(1f)) {
                 Text(

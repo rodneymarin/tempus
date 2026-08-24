@@ -88,8 +88,8 @@ fun MonthCalendarStrip(
 
                                 val bgColor = when {
                                     !isInRange -> Color.Transparent
-                                    hasEvent -> MaterialTheme.colorScheme.primary.copy(alpha = 0.55f)
-                                    else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+                                    hasEvent -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                                    else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
                                 }
 
                                 Box(

@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -145,17 +146,41 @@ object TempusComponents {
     // ============ CARD UNIFICADO PARA LISTAS ============
 
     /**
+     * Forma de un item dentro de una lista agrupada estilo M3: el grupo
+     * completo tiene esquinas exteriores muy redondeadas (20dp) y las
+     * esquinas internas (que colindan con otros items) casi rectas (4dp);
+     * el primero/último redondean solo sus esquinas del extremo.
+     */
+    @Composable
+    fun listItemShape(index: Int, count: Int): Shape {
+        val outer = 20.dp
+        val inner = 4.dp
+        return when {
+            count <= 1 -> RoundedCornerShape(outer)
+            index == 0 -> RoundedCornerShape(
+                topStart = outer, topEnd = outer, bottomStart = inner, bottomEnd = inner,
+            )
+            index == count - 1 -> RoundedCornerShape(
+                topStart = inner, topEnd = inner, bottomStart = outer, bottomEnd = outer,
+            )
+            else -> RoundedCornerShape(inner)
+        }
+    }
+
+    /**
      * Card único para todos los items de lista (registros del dashboard,
      * historial de eventos, etc.). Diseño: superficie adaptada (blanco en
-     * tema claro / gris oscuro en dark), sin sombra, esquinas 16dp.
+     * tema claro / gris oscuro en dark), sin sombra. Dentro de una lista
+     * agrupada pasar `shape` desde listItemShape(index, count).
      */
     @Composable
     fun TempusCard(
         modifier: Modifier = Modifier,
         onClick: (() -> Unit)? = null,
+        shape: Shape? = null,
         content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
     ) {
-        val shape = RoundedCornerShape(16.dp)
+        val cardShape = shape ?: RoundedCornerShape(24.dp)
         val colors = CardDefaults.cardColors(containerColor = adaptiveSurface())
         val noElevation = CardDefaults.cardElevation(
             defaultElevation = 0.dp,
@@ -168,7 +193,7 @@ object TempusComponents {
             Card(
                 onClick = onClick,
                 modifier = modifier,
-                shape = shape,
+                shape = cardShape,
                 colors = colors,
                 elevation = noElevation,
                 content = content,
@@ -176,7 +201,7 @@ object TempusComponents {
         } else {
             Card(
                 modifier = modifier,
-                shape = shape,
+                shape = cardShape,
                 colors = colors,
                 elevation = noElevation,
                 content = content,

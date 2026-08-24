@@ -1,10 +1,14 @@
 package com.rodneymarin.tempus.ui.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
@@ -30,13 +34,16 @@ fun LogHistory(
     onDelete: (LogEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        entries.forEach { entry ->
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        entries.forEachIndexed { index, entry ->
             val date = LocalDate.ofEpochDay(entry.epochDay)
             val header = date
                 .format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es")))
                 .replaceFirstChar { it.uppercase() }
-            TempusComponents.TempusCard(modifier = Modifier.fillMaxWidth()) {
+            TempusComponents.TempusCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = TempusComponents.listItemShape(index, entries.size),
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -54,12 +61,19 @@ fun LogHistory(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    IconButton(onClick = { onDelete(entry) }) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = stringResource(R.string.delete),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest, CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        IconButton(onClick = { onDelete(entry) }, modifier = Modifier.size(40.dp)) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = stringResource(R.string.delete),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
             }

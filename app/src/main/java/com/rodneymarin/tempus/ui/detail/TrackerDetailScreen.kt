@@ -1,5 +1,6 @@
 package com.rodneymarin.tempus.ui.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -141,7 +142,9 @@ fun TrackerDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Box(
-                    Modifier.size(56.dp),
+                    Modifier
+                        .size(56.dp)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(tracker.emoji, style = MaterialTheme.typography.titleLarge)
