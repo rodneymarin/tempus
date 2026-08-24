@@ -19,13 +19,14 @@ val EMOJI_PRESETS = listOf(
     "💧", "🚽", "💊", "🏃", "💪", "😴", "🥗", "🍎",
     "☕", "🚭", "🧘", "🦷", "🥤", "🚿", "🧹", "📵",
     "🎮", "📚", "🧠", "❤️", "🌙", "🚶", "🏋️", "💰",
+    "🍽️", "🛌", "🚗", "🚲", "🏊", "🧩", "🎨", "🎵", "📝", "🛒",
 )
 
 data class EditorUiState(
     val name: String = "",
     val emoji: String = EMOJI_PRESETS.first(),
-    val minText: String = "",
-    val maxText: String = "",
+    val minFrequency: Int? = null,
+    val maxFrequency: Int? = null,
     val period: FrequencyPeriod = FrequencyPeriod.WEEK,
     val nameError: Boolean = false,
     val rangeError: Int? = null,
@@ -55,8 +56,8 @@ class TrackerEditorViewModel(
                 _ui.value = EditorUiState(
                     name = t.name,
                     emoji = t.emoji,
-                    minText = t.minFrequency?.toString() ?: "",
-                    maxText = t.maxFrequency?.toString() ?: "",
+                    minFrequency = t.minFrequency,
+                    maxFrequency = t.maxFrequency,
                     period = t.period,
                     loading = false,
                 )
@@ -68,9 +69,9 @@ class TrackerEditorViewModel(
 
     fun onNameChange(v: String) = _ui.update { it.copy(name = v, nameError = false) }
     fun onEmojiChange(v: String) = _ui.update { it.copy(emoji = v) }
-    fun onMinChange(v: String) = _ui.update { it.copy(minText = v.filter(Char::isDigit), rangeError = null) }
-    fun onMaxChange(v: String) = _ui.update { it.copy(maxText = v.filter(Char::isDigit), rangeError = null) }
-    fun onPeriodChange(v: FrequencyPeriod) = _ui.update { it.copy(period = v) }
+    fun onMinChange(v: Int?) = _ui.update { it.copy(minFrequency = v, rangeError = null) }
+    fun onMaxChange(v: Int?) = _ui.update { it.copy(maxFrequency = v, rangeError = null) }
+    fun onPeriodChange(v: FrequencyPeriod) = _ui.update { it.copy(period = v, minFrequency = null, maxFrequency = null, rangeError = null) }
 
     fun save() {
         val s = _ui.value
@@ -78,7 +79,9 @@ class TrackerEditorViewModel(
             _ui.update { it.copy(nameError = true) }
             return
         }
-        when (val r = FrequencyRange.parse(s.minText, s.maxText)) {
+        val min = s.minFrequency
+        val max = s.maxFrequency
+        when (val r = FrequencyRange.parse(min?.toString() ?: "", max?.toString() ?: "")) {
             is FrequencyRange.Result.Valid -> {
                 viewModelScope.launch {
                     if (trackerId == null) {

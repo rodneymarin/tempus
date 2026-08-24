@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,6 +54,7 @@ import com.rodneymarin.tempus.data.LogEntry
 import com.rodneymarin.tempus.domain.FrequencyPeriod
 import com.rodneymarin.tempus.domain.FrequencyRange
 import com.rodneymarin.tempus.domain.StatsCalculator.Status
+import com.rodneymarin.tempus.ui.components.TempusComponents
 import com.rodneymarin.tempus.ui.dashboard.StatusChip
 import com.rodneymarin.tempus.ui.theme.StatusAmber
 import com.rodneymarin.tempus.ui.theme.StatusGreen
@@ -141,10 +144,10 @@ fun TrackerDetailScreen(
                     Modifier.size(56.dp),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(tracker.emoji, style = MaterialTheme.typography.displaySmall)
+                    Text(tracker.emoji, style = MaterialTheme.typography.titleLarge)
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(tracker.name, style = MaterialTheme.typography.headlineSmall)
+                    Text(tracker.name, style = MaterialTheme.typography.titleLarge)
                     Text(
                         stringResource(
                             R.string.expected_summary,
@@ -152,34 +155,53 @@ fun TrackerDetailScreen(
                                 unitLabel(tracker.period)
                             }",
                         ),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 ui.status?.let { st ->
-                    StatusChip(st.status)
+                    if (st.status != Status.NO_RANGE) {
+                        StatusChip(st.status)
+                    }
                 }
             }
 
-            // Actions
+            // Actions - using standardized buttons
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = viewModel::logToday,
                     enabled = !todayHasEvent,
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
+                    ),
+                    shape = RoundedCornerShape(50),
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Spacer(Modifier.size(8.dp))
-                    Text(stringResource(if (todayHasEvent) R.string.log_today_done else R.string.log_today))
+                    Text(
+                        stringResource(if (todayHasEvent) R.string.log_today_done else R.string.log_today),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
                 OutlinedButton(
                     onClick = { showSheet = true },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     border = androidx.compose.foundation.BorderStroke(
-                        1.dp,
+                        1.5.dp,
                         MaterialTheme.colorScheme.outline.copy(alpha = 0.30f),
                     ),
-                ) { Text(stringResource(R.string.log_another_day)) }
+                    shape = RoundedCornerShape(50),
+                ) {
+                    Text(stringResource(R.string.log_another_day), style = MaterialTheme.typography.labelLarge)
+                }
             }
 
             // 30-day calendar
@@ -197,7 +219,7 @@ fun TrackerDetailScreen(
             if (ui.history.isEmpty()) {
                 Text(
                     stringResource(R.string.history_empty),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
@@ -220,18 +242,29 @@ fun TrackerDetailScreen(
         }
     }
 
+    // Material3 styled dialogs with standardized buttons
     logToDelete?.let { entry ->
         AlertDialog(
             onDismissRequest = { logToDelete = null },
-            title = { Text(stringResource(R.string.delete_log_confirm)) },
+            title = { Text(stringResource(R.string.delete_log_confirm), style = MaterialTheme.typography.titleLarge) },
             confirmButton = {
-                TextButton(onClick = {
-                    viewModel.deleteLog(entry.id)
-                    logToDelete = null
-                }) { Text(stringResource(R.string.delete_confirm_action)) }
+                Button(
+                    onClick = {
+                        viewModel.deleteLog(entry.id)
+                        logToDelete = null
+                    },
+                    modifier = Modifier.padding(end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    ),
+                    shape = RoundedCornerShape(50),
+                ) { Text(stringResource(R.string.delete_confirm_action)) }
             },
             dismissButton = {
-                TextButton(onClick = { logToDelete = null }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { logToDelete = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
             },
         )
     }
@@ -239,15 +272,25 @@ fun TrackerDetailScreen(
     registerDay?.let { day ->
         AlertDialog(
             onDismissRequest = { registerDay = null },
-            title = { Text(stringResource(R.string.register_day_confirm, day.format(dayFormatter))) },
+            title = { Text(stringResource(R.string.register_day_confirm, day.format(dayFormatter)), style = MaterialTheme.typography.titleLarge) },
             confirmButton = {
-                TextButton(onClick = {
-                    viewModel.logOn(day, null)
-                    registerDay = null
-                }) { Text(stringResource(R.string.register)) }
+                Button(
+                    onClick = {
+                        viewModel.logOn(day, null)
+                        registerDay = null
+                    },
+                    modifier = Modifier.padding(end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    shape = RoundedCornerShape(50),
+                ) { Text(stringResource(R.string.register)) }
             },
             dismissButton = {
-                TextButton(onClick = { registerDay = null }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { registerDay = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
             },
         )
     }
@@ -255,15 +298,25 @@ fun TrackerDetailScreen(
     deleteDay?.let { day ->
         AlertDialog(
             onDismissRequest = { deleteDay = null },
-            title = { Text(stringResource(R.string.delete_day_confirm)) },
+            title = { Text(stringResource(R.string.delete_day_confirm), style = MaterialTheme.typography.titleLarge) },
             confirmButton = {
-                TextButton(onClick = {
-                    viewModel.deleteDay(day)
-                    deleteDay = null
-                }) { Text(stringResource(R.string.delete_confirm_action)) }
+                Button(
+                    onClick = {
+                        viewModel.deleteDay(day)
+                        deleteDay = null
+                    },
+                    modifier = Modifier.padding(end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    ),
+                    shape = RoundedCornerShape(50),
+                ) { Text(stringResource(R.string.delete_confirm_action)) }
             },
             dismissButton = {
-                TextButton(onClick = { deleteDay = null }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { deleteDay = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
             },
         )
     }
@@ -271,14 +324,22 @@ fun TrackerDetailScreen(
     if (confirmDeleteTracker) {
         AlertDialog(
             onDismissRequest = { confirmDeleteTracker = false },
-            title = { Text(stringResource(R.string.delete_tracker_confirm, tracker?.name ?: "")) },
+            title = { Text(stringResource(R.string.delete_tracker_confirm, tracker?.name ?: ""), style = MaterialTheme.typography.titleLarge) },
             confirmButton = {
-                TextButton(onClick = { viewModel.deleteTracker() }) {
-                    Text(stringResource(R.string.delete_confirm_action))
-                }
+                Button(
+                    onClick = { viewModel.deleteTracker() },
+                    modifier = Modifier.padding(end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    ),
+                    shape = RoundedCornerShape(50),
+                ) { Text(stringResource(R.string.delete_confirm_action)) }
             },
             dismissButton = {
-                TextButton(onClick = { confirmDeleteTracker = false }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { confirmDeleteTracker = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
             },
         )
     }
@@ -296,7 +357,6 @@ private fun SectionTitle(text: String) {
 @Composable
 private fun unitLabel(period: FrequencyPeriod): String = stringResource(
     when (period) {
-        FrequencyPeriod.DAY -> R.string.unit_day
         FrequencyPeriod.WEEK -> R.string.unit_week
         FrequencyPeriod.MONTH -> R.string.unit_month
     }

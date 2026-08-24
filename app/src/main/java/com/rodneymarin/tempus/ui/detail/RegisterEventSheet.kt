@@ -4,16 +4,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
@@ -26,9 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.rodneymarin.tempus.R
+import com.rodneymarin.tempus.ui.components.TempusComponents
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,19 +61,37 @@ fun RegisterEventSheet(
     ) {
         Text(stringResource(R.string.log_another_day), style = MaterialTheme.typography.titleMedium)
 
-        // Date picker trigger
-        OutlinedButton(
+        // Date picker trigger - using SecondaryButton style
+        Button(
             onClick = { showDatePicker = true },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+            shape = RoundedCornerShape(50),
         ) {
-            Text(selectedDate.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", java.util.Locale("es"))))
+            Text(
+                selectedDate.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es"))),
+                style = MaterialTheme.typography.bodyLarge,
+            )
         }
 
-        // Optional time
+        // Optional time - pill relleno sin borde, consistente con el sistema
         FilterChip(
             selected = showTime,
             onClick = { showTime = !showTime },
             label = { Text(stringResource(R.string.add_time)) },
+            colors = FilterChipDefaults.filterChipColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                labelColor = MaterialTheme.colorScheme.onSurface,
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            border = null,
+            shape = RoundedCornerShape(50),
         )
         if (showTime) {
             TimePicker(state = timeState)
@@ -78,15 +103,23 @@ fun RegisterEventSheet(
             )
             Text(
                 stringResource(R.string.sheet_has_event_warning, replacement),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.error,
             )
         }
 
+        // Primary action button - using PrimaryButton style
         Button(
             onClick = { onConfirm(selectedDate, if (showTime) timeState.hour * 60 + timeState.minute else null) },
-            modifier = Modifier.fillMaxWidth(),
-        ) { Text(stringResource(R.string.register)) }
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            shape = RoundedCornerShape(50),
+        ) { Text(stringResource(R.string.register), style = MaterialTheme.typography.labelLarge) }
 
         if (showDatePicker) {
             val datePickerState = rememberDatePickerState(
@@ -101,15 +134,20 @@ fun RegisterEventSheet(
             DatePickerDialog(
                 onDismissRequest = { showDatePicker = false },
                 confirmButton = {
-                    TextButtonConfirm {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            selectedDate = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
-                        }
-                        showDatePicker = false
+                    TextButton(
+                        onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                selectedDate = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
+                            }
+                            showDatePicker = false
+                        },
+                        modifier = Modifier.padding(end = 8.dp),
+                    ) {
+                        Text(stringResource(R.string.save))
                     }
                 },
                 dismissButton = {
-                    androidx.compose.material3.TextButton(onClick = { showDatePicker = false }) {
+                    TextButton(onClick = { showDatePicker = false }) {
                         Text(stringResource(R.string.cancel))
                     }
                 },
@@ -117,12 +155,5 @@ fun RegisterEventSheet(
                 DatePicker(state = datePickerState)
             }
         }
-    }
-}
-
-@Composable
-private fun TextButtonConfirm(onClick: () -> Unit) {
-    androidx.compose.material3.TextButton(onClick = onClick) {
-        Text(stringResource(R.string.save))
     }
 }

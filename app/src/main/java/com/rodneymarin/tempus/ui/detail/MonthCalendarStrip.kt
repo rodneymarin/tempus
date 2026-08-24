@@ -88,8 +88,8 @@ fun MonthCalendarStrip(
 
                                 val bgColor = when {
                                     !isInRange -> Color.Transparent
-                                    hasEvent -> MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
-                                    else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f)
+                                    hasEvent -> MaterialTheme.colorScheme.primary.copy(alpha = 0.55f)
+                                    else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
                                 }
 
                                 Box(
@@ -99,7 +99,7 @@ fun MonthCalendarStrip(
                                         .clip(RoundedCornerShape(10.dp))
                                         .then(if (isInRange) Modifier.clickable { onDayClick(cellDate) } else Modifier)
                                         .background(bgColor)
-                                        .padding(4.dp),
+                                        .padding(8.dp),
                                     contentAlignment = Alignment.BottomCenter,
                                 ) {
                                     if (isInRange) {

@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.rodneymarin.tempus.R
 import com.rodneymarin.tempus.data.LogEntry
+import com.rodneymarin.tempus.ui.components.TempusComponents
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -31,18 +30,13 @@ fun LogHistory(
     onDelete: (LogEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         entries.forEach { entry ->
             val date = LocalDate.ofEpochDay(entry.epochDay)
             val header = date
                 .format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es")))
                 .replaceFirstChar { it.uppercase() }
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
-                ),
-            ) {
+            TempusComponents.TempusCard(modifier = Modifier.fillMaxWidth()) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -50,13 +44,13 @@ fun LogHistory(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                 ) {
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text(header, style = MaterialTheme.typography.titleSmall)
+                        Text(header, style = MaterialTheme.typography.titleMedium)
                         Text(
                             entry.timeMinutes?.let { minutes ->
                                 LocalTime.of(minutes / 60, minutes % 60)
                                     .format(DateTimeFormatter.ofPattern("h:mm a", Locale("es")))
                             } ?: stringResource(R.string.no_time),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }

@@ -28,12 +28,7 @@ class StatsCalculatorTest {
         assertEquals(LocalDate.of(2026, 8, 31), StatsCalculator.periodEnd(today, FrequencyPeriod.MONTH))
     }
 
-    @Test fun dayBoundaries_equalToday() {
-        assertEquals(today, StatsCalculator.periodStart(today, FrequencyPeriod.DAY))
-        assertEquals(today, StatsCalculator.periodEnd(today, FrequencyPeriod.DAY))
-    }
-
-    // ---- status (projected pace) ----
+    // ---- status (ventana móvil de los últimos N días) ----
 
     private fun tracker(min: Int?, max: Int?, period: FrequencyPeriod = FrequencyPeriod.WEEK) =
         Triple(min, max, period)
@@ -41,47 +36,94 @@ class StatsCalculatorTest {
     private fun status(logs: List<LogEntry>, t: Triple<Int?, Int?, FrequencyPeriod>): StatsCalculator.TrackStatus =
         StatsCalculator.statusFor(logs, t.first, t.second, t.third, today)
 
-    @Test fun mondayTwoLogs_ofThreeToFivePerWeek_isHigh() {
-        // 2 logs on day 1/7 → projected 14 → exceeds 5
-        val t = tracker(3, 5)
-        val s = status(listOf(log(day(2026, 8, 10)), log(day(2026, 8, 10))), t)
-        assertEquals(StatsCalculator.Status.HIGH, s.status)
-        assertEquals(2, s.count)
-        assertEquals(14, s.projected)
-    }
-
-    @Test fun mondayNoLogs_isLow() {
-        val t = tracker(3, 5)
-        val s = status(emptyList(), t)
+    @Test fun oneLogToday_min3Max5_isLow() {
+        // 1 evento en los últimos 7 días < mínimo 3 → LOW (caso reportado por el usuario)
+        val t = tracker(3, 4)
+        val s = status(listOf(log(day(2026, 8, 10))), t)
         assertEquals(StatsCalculator.Status.LOW, s.status)
-        assertEquals(0, s.projected)
+        assertEquals(1, s.count)
     }
 
-    @Test fun fridayThreeLogs_ofThreeToFive_isOnTrack() {
-        // Friday 2026-08-14: elapsed 5/7 → projected 3/(5/7)=4.2 → 4 ∈ [3,5]
-        val friday = LocalDate.of(2026, 8, 14)
+    @Test fun zeroLogs_isLow() {
         val t = tracker(3, 5)
-        val s = StatsCalculator.statusFor(
-            listOf(log(day(2026, 8, 14)), log(day(2026, 8, 14)), log(day(2026, 8, 14))),
-            t.first, t.second, t.third, friday
+        assertEquals(StatsCalculator.Status.LOW, status(emptyList(), t).status)
+    }
+
+    @Test fun fourLogsInLastSevenDays_min3Max5_isOnTrack() {
+        // 4 eventos dentro de la ventana de 7 días ∈ [3,5] → ON_TRACK
+        val t = tracker(3, 5)
+        val s = status(
+            listOf(
+                log(day(2026, 8, 4)), log(day(2026, 8, 6)),
+                log(day(2026, 8, 8)), log(day(2026, 8, 10)),
+            ),
+            t,
         )
         assertEquals(StatsCalculator.Status.ON_TRACK, s.status)
-        assertEquals(4, s.projected)
+        assertEquals(4, s.count)
     }
 
-    @Test fun maxOnly_threeLogsFriday_isHigh() {
-        val t = tracker(null, 2)
-        val s = status(listOf(log(day(2026, 8, 14)), log(day(2026, 8, 14)), log(day(2026, 8, 14))), t)
+    @Test fun sixLogsInLastSevenDays_max5_isHigh() {
+        val t = tracker(3, 5)
+        val s = status(
+            listOf(
+                log(day(2026, 8, 5)), log(day(2026, 8, 6)), log(day(2026, 8, 7)),
+                log(day(2026, 8, 8)), log(day(2026, 8, 9)), log(day(2026, 8, 10)),
+            ),
+            t,
+        )
         assertEquals(StatsCalculator.Status.HIGH, s.status)
     }
 
-    @Test fun minOnly_oneLogFriday_isLow() {
-        val friday = LocalDate.of(2026, 8, 14)
-        val t = tracker(3, null)
-        val s = StatsCalculator.statusFor(
-            listOf(log(day(2026, 8, 14))),
-            t.first, t.second, t.third, friday
+    @Test fun logsOutsideWindow_doNotCount() {
+        // Un log hace 8 días (fuera de ventana) + ninguno reciente → LOW
+        val t = tracker(3, 5)
+        val s = status(listOf(log(day(2026, 8, 2))), t)
+        assertEquals(0, s.count)
+        assertEquals(StatsCalculator.Status.LOW, s.status)
+    }
+
+    @Test fun boundary_exactlyMin_isOnTrack() {
+        val t = tracker(3, 5)
+        val s = status(
+            listOf(log(day(2026, 8, 8)), log(day(2026, 8, 9)), log(day(2026, 8, 10))), t,
         )
+        assertEquals(StatsCalculator.Status.ON_TRACK, s.status)
+    }
+
+    @Test fun boundary_exactlyMax_isOnTrack() {
+        val t = tracker(3, 5)
+        val s = status(
+            listOf(
+                log(day(2026, 8, 7)), log(day(2026, 8, 8)),
+                log(day(2026, 8, 9)), log(day(2026, 8, 10)),
+            ),
+            t,
+        )
+        assertEquals(StatsCalculator.Status.ON_TRACK, s.status)
+    }
+
+    @Test fun monthlyWindow_countsLastThirtyDays() {
+        val t = tracker(3, 5, FrequencyPeriod.MONTH)
+        // Logs a 10 y 20 días de hoy (2026-08-10): dentro de ventana de 30 días
+        val s = status(
+            listOf(log(day(2026, 7, 21)), log(day(2026, 7, 31))), t,
+        )
+        assertEquals(2, s.count)
+        assertEquals(StatsCalculator.Status.LOW, s.status)
+    }
+
+    @Test fun maxOnly_threeLogs_isHigh() {
+        val t = tracker(null, 2)
+        val s = status(
+            listOf(log(day(2026, 8, 9)), log(day(2026, 8, 10)), log(day(2026, 8, 10))), t,
+        )
+        assertEquals(StatsCalculator.Status.HIGH, s.status)
+    }
+
+    @Test fun minOnly_oneLogToday_isLow() {
+        val t = tracker(3, null)
+        val s = status(listOf(log(day(2026, 8, 10))), t)
         assertEquals(StatsCalculator.Status.LOW, s.status)
     }
 
@@ -117,9 +159,5 @@ class StatsCalculatorTest {
         assertEquals(1, counts[LocalDate.of(2026, 8, 9)])
         assertEquals(0, counts[LocalDate.of(2026, 8, 6)])
         assertEquals(LocalDate.of(2026, 7, 7), counts.keys.first()) // oldest day
-    }
-
-    @Test fun dayLabel_todayIsHoy() {
-        assertEquals("Hoy", StatsCalculator.labelShort(today, today, FrequencyPeriod.DAY, today))
     }
 }

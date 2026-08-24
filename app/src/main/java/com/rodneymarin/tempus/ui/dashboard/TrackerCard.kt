@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rodneymarin.tempus.R
+import com.rodneymarin.tempus.domain.StatsCalculator.Status
+import com.rodneymarin.tempus.ui.components.TempusComponents
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -30,12 +30,9 @@ fun TrackerCard(
     onOpen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
+    TempusComponents.TempusCard(
         onClick = onOpen,
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
-        ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -57,12 +54,15 @@ fun TrackerCard(
                 )
                 Text(
                     lastEventSummary(row.lastEventDay),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Column(horizontalAlignment = Alignment.End) {
-                StatusChip(row.status)
+                val status = row.status
+                if (status != Status.NO_RANGE) {
+                    StatusChip(status)
+                }
             }
         }
     }

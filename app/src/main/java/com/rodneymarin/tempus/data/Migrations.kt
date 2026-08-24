@@ -19,3 +19,14 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         )
     }
 }
+
+/**
+ * v2 → v3: elimina el período DAY. Migra trackers existentes por día a semana.
+ */
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "UPDATE trackers SET period='WEEK' WHERE period='DAY'"
+        )
+    }
+}

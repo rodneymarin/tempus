@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
-import kotlin.math.roundToInt
 
 /**
  * Pure frequency math: calendar period boundaries, counts, projected-pace status.
@@ -16,13 +15,11 @@ import kotlin.math.roundToInt
 object StatsCalculator {
 
     fun periodStart(day: LocalDate, period: FrequencyPeriod): LocalDate = when (period) {
-        FrequencyPeriod.DAY -> day
         FrequencyPeriod.WEEK -> day.with(DayOfWeek.MONDAY)
         FrequencyPeriod.MONTH -> day.withDayOfMonth(1)
     }
 
     fun periodEnd(day: LocalDate, period: FrequencyPeriod): LocalDate = when (period) {
-        FrequencyPeriod.DAY -> day
         FrequencyPeriod.WEEK -> day.with(DayOfWeek.SUNDAY)
         FrequencyPeriod.MONTH -> day.with(TemporalAdjusters.lastDayOfMonth())
     }
@@ -32,12 +29,21 @@ object StatsCalculator {
 
     enum class Status { ON_TRACK, LOW, HIGH, NO_RANGE }
 
-    data class TrackStatus(val count: Int, val projected: Int, val status: Status)
+    data class TrackStatus(val count: Int, val status: Status)
+
+    /** Longitud de la ventana móvil según el periodo configurado. */
+    fun windowDays(period: FrequencyPeriod): Long = when (period) {
+        FrequencyPeriod.WEEK -> 7L
+        FrequencyPeriod.MONTH -> 30L
+    }
 
     /**
-     * Status of the CURRENT calendar period. Compares the projected end-of-period
-     * count (count ÷ elapsed fraction) against the range, so early-period counts
-     * are judged by pace, not by raw total.
+     * Status basado en una ventana móvil de los últimos N días (hoy incluido),
+     * donde N es la longitud del periodo (7 para semana, 30 para mes).
+     * Compara el conteo real de la ventana contra el rango esperado:
+     * count > max → HIGH, count < min → LOW, en rango → ON_TRACK.
+     * Sin proyecciones: un conteo bajo al inicio de la semana es LOW,
+     * no se extrapola linealmente.
      */
     fun statusFor(
         logs: List<LogEntry>,
@@ -46,20 +52,16 @@ object StatsCalculator {
         period: FrequencyPeriod,
         today: LocalDate = LocalDate.now(),
     ): TrackStatus {
-        val start = periodStart(today, period).toEpochDay()
-        val end = periodEnd(today, period).toEpochDay()
+        val start = today.toEpochDay() - (windowDays(period) - 1)
+        val end = today.toEpochDay()
         val count = countInRange(logs, start, end)
-        val totalDays = (end - start + 1).toDouble()
-        val elapsedDays = ((today.toEpochDay() - start).coerceAtLeast(0) + 1).toDouble()
-        val progress = (elapsedDays / totalDays).coerceIn(0.0, 1.0)
-        val projected = if (progress > 0) (count / progress).roundToInt() else count
         val status = when {
             min == null && max == null -> Status.NO_RANGE
-            max != null && projected > max -> Status.HIGH
-            min != null && projected < min -> Status.LOW
+            max != null && count > max -> Status.HIGH
+            min != null && count < min -> Status.LOW
             else -> Status.ON_TRACK
         }
-        return TrackStatus(count = count, projected = projected, status = status)
+        return TrackStatus(count = count, status = status)
     }
 
     data class PeriodPoint(
@@ -69,17 +71,16 @@ object StatsCalculator {
         val count: Int,
     )
 
-    /** Last N calendar periods (8; 14 for daily), oldest → newest. */
+    /** Last 8 calendar periods, oldest → newest. */
     fun lastPeriods(
         logs: List<LogEntry>,
         period: FrequencyPeriod,
         today: LocalDate = LocalDate.now(),
     ): List<PeriodPoint> {
-        val n = if (period == FrequencyPeriod.DAY) 14 else 8
+        val n = 8
         val currentStart = periodStart(today, period)
         return (n - 1 downTo 0).map { offset ->
             val anchor = when (period) {
-                FrequencyPeriod.DAY -> today.minusDays(offset.toLong())
                 FrequencyPeriod.WEEK -> currentStart.minusWeeks(offset.toLong())
                 FrequencyPeriod.MONTH -> currentStart.minusMonths(offset.toLong())
             }
@@ -101,9 +102,6 @@ object StatsCalculator {
         today: LocalDate,
         locale: Locale = Locale("es"),
     ): String = when (period) {
-        FrequencyPeriod.DAY ->
-            if (start == today) "Hoy"
-            else start.format(DateTimeFormatter.ofPattern("d MMM", locale))
         FrequencyPeriod.WEEK -> {
             start.format(DateTimeFormatter.ofPattern("d MMM", locale))
         }

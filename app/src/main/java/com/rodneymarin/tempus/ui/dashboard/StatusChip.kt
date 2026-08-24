@@ -28,24 +28,37 @@ fun StatusChip(status: Status, modifier: Modifier = Modifier) {
     val labelRes: Int
     val color: Color
     when (status) {
-        Status.ON_TRACK -> { labelRes = R.string.status_on_track; color = StatusGreen }
-        Status.LOW -> { labelRes = R.string.status_low; color = StatusAmber }
-        Status.HIGH -> { labelRes = R.string.status_high; color = StatusRed }
-        Status.NO_RANGE -> { labelRes = R.string.status_no_range; color = MaterialTheme.colorScheme.outline }
+        Status.ON_TRACK -> {
+            labelRes = R.string.status_on_track
+            color = StatusGreen
+        }
+        Status.LOW -> {
+            labelRes = R.string.status_low
+            color = StatusAmber
+        }
+        Status.HIGH -> {
+            labelRes = R.string.status_high
+            color = StatusRed
+        }
+        Status.NO_RANGE -> {
+            labelRes = R.string.status_no_range
+            color = MaterialTheme.colorScheme.outline
+        }
     }
+
     Surface(
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(50), // Pill perfecto, consistente con el sistema
         color = color.copy(alpha = 0.14f),
         contentColor = color,
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
         ) {
-            Box(Modifier.size(7.dp).background(color, CircleShape))
-            Text(stringResource(labelRes), style = MaterialTheme.typography.labelMedium)
+            Box(Modifier.size(8.dp).background(color, CircleShape))
+            Text(stringResource(labelRes), style = MaterialTheme.typography.labelLarge)
         }
     }
 }

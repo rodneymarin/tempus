@@ -13,7 +13,6 @@
     <string name="field_min">Mínimo</string>
     <string name="field_max">Máximo</string>
     <string name="field_period">¿Cada cuánto?</string>
-    <string name="period_day">Por día</string>
     <string name="period_week">Por semana</string>
     <string name="period_month">Por mes</string>
     <string name="range_help">Ejemplo: 3–5 veces por semana</string>
@@ -42,8 +41,8 @@
     <string name="status_low">Bajo</string>
     <string name="status_high">Alto</string>
     <string name="status_no_range">Sin rango</string>
+    <string name="no_range">Sin rango</string>
     <string name="expected_summary">Esperado: %1$s</string>
-    <string name="period_prefix_day">Hoy:</string>
     <string name="period_prefix_week">Esta semana:</string>
     <string name="period_prefix_month">Este mes:</string>
     <string name="this_period_count">%1$s %2$d</string>
@@ -57,7 +56,6 @@
     <string name="delete_log_confirm">¿Eliminar este registro?</string>
     <string name="delete_tracker_confirm">¿Eliminar «%1$s» y todo su historial?</string>
     <string name="delete_confirm_action">Eliminar</string>
-    <string name="unit_day">por día</string>
     <string name="unit_week">por semana</string>
     <string name="unit_month">por mes</string>
     <string name="history_empty">Sin registros aún</string>

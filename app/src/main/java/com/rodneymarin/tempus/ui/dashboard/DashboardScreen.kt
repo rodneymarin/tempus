@@ -6,20 +6,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -77,7 +81,7 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.dashboard_title)) },
+                title = { Text(stringResource(R.string.dashboard_title), style = MaterialTheme.typography.titleLarge) },
                 actions = { ThemeMenu(themePrefs) },
             )
         },
@@ -87,6 +91,8 @@ fun DashboardScreen(
                 onClick = onCreateTracker,
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
+                elevation = FloatingActionButtonDefaults.elevation(0.dp),
+                shape = RoundedCornerShape(50),
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.new_tracker))
             }
@@ -131,7 +137,7 @@ private fun ThemeMenu(themePrefs: ThemePreferenceManager) {
                     ThemeMode.SYSTEM -> systemLabel
                 }
                 DropdownMenuItem(
-                    text = { Text(label) },
+                    text = { Text(label, style = MaterialTheme.typography.bodyLarge) },
                     leadingIcon = {
                         if (mode == entry) {
                             Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -160,11 +166,21 @@ private fun EmptyState(onCreate: () -> Unit, modifier: Modifier = Modifier) {
         Spacer(Modifier.height(8.dp))
         Text(
             stringResource(R.string.empty_state_body),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(24.dp))
-        Button(onClick = onCreate) { Text(stringResource(R.string.empty_state_action)) }
+        Button(
+            onClick = onCreate,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            shape = RoundedCornerShape(50),
+        ) { Text(stringResource(R.string.empty_state_action), style = MaterialTheme.typography.labelLarge) }
     }
 }
