@@ -169,9 +169,9 @@ object TempusComponents {
 
     /**
      * Card único para todos los items de lista (registros del dashboard,
-     * historial de eventos, etc.). Diseño: superficie adaptada (blanco en
-     * tema claro / gris oscuro en dark), sin sombra. Dentro de una lista
-     * agrupada pasar `shape` desde listItemShape(index, count).
+     * historial de eventos, etc.). Diseño: blanco en tema claro / primary
+     * al 10% en dark, sin sombra. Dentro de una lista agrupada pasar
+     * `shape` desde listItemShape(index, count).
      */
     @Composable
     fun TempusCard(
@@ -181,7 +181,11 @@ object TempusComponents {
         content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
     ) {
         val cardShape = shape ?: RoundedCornerShape(24.dp)
-        val colors = CardDefaults.cardColors(containerColor = adaptiveSurface())
+        val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+        val containerColor =
+            if (isDark) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+            else adaptiveSurface()
+        val colors = CardDefaults.cardColors(containerColor = containerColor)
         val noElevation = CardDefaults.cardElevation(
             defaultElevation = 0.dp,
             pressedElevation = 0.dp,

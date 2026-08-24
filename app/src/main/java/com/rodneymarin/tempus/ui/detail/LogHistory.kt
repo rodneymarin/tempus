@@ -64,7 +64,7 @@ fun LogHistory(
                     Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .background(MaterialTheme.colorScheme.surfaceContainerHighest, CircleShape),
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), CircleShape),
                         contentAlignment = Alignment.Center,
                     ) {
                         IconButton(onClick = { onDelete(entry) }, modifier = Modifier.size(40.dp)) {

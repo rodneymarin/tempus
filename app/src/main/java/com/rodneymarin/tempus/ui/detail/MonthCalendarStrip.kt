@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.LocalDate
@@ -86,10 +87,12 @@ fun MonthCalendarStrip(
                                 val isToday = cellDate == today
                                 val hasEvent = isInRange && (cellDate in daysWithEvent)
 
+                                val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
                                 val bgColor = when {
                                     !isInRange -> Color.Transparent
                                     hasEvent -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
-                                    else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                                    isDark -> MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                                    else -> Color.White
                                 }
 
                                 Box(

@@ -15,7 +15,7 @@ val TempusLightBackground = Color(0xFFF1F2F6)
 
 // Dark theme — bright blue-violet (the one you liked)
 val TempusDarkPrimary    = Color(0xFF558FFF)   // fully saturated blue-violet
-val TempusDarkOnPrimary  = Color(0xFF002B5C)   // dark blue
+val TempusDarkOnPrimary  = Color(0xFFFFFFFF)   // white — text/icons on primary action buttons
 val TempusDarkPrimaryContainer = Color(0xFF1E3A5F) // deep blue
 val TempusDarkOnPrimaryContainer = Color(0xFFD6E3F8) // soft blue-lavender
 
