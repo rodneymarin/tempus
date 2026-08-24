@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -18,7 +20,11 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -268,33 +274,40 @@ object TempusComponents {
         }
     }
 
-    // ============ SELECTOR DE PERIODO (pills de selección rellenos) ============
+    // ============ SELECTOR DE PERIODO (Segmented Button M3) ============
 
+    /**
+     * Segmented Button según lineamientos Material 3: contenedor pill con
+     * borde outline, divisores entre segmentos, segmento seleccionado con
+     * relleno secondaryContainer e ícono de check.
+     */
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun PeriodSelector(
         selected: FrequencyPeriod,
         onSelect: (FrequencyPeriod) -> Unit,
         modifier: Modifier = Modifier,
     ) {
-        Row(
-            modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            FrequencyPeriod.entries.forEach { period ->
+        SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
+            FrequencyPeriod.entries.forEachIndexed { index, period ->
                 val isSelected = selected == period
-                Surface(
+                SegmentedButton(
+                    selected = isSelected,
                     onClick = { onSelect(period) },
-                    shape = PillShape,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.surfaceContainerHighest,
-                    contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.padding(vertical = 16.dp),
-                    ) {
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = FrequencyPeriod.entries.size,
+                    ),
+                    icon = {
+                        if (isSelected) {
+                            Icon(
+                                Icons.Default.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        }
+                    },
+                    label = {
                         Text(
                             stringResource(
                                 when (period) {
@@ -304,8 +317,8 @@ object TempusComponents {
                             ),
                             style = MaterialTheme.typography.labelLarge,
                         )
-                    }
-                }
+                    },
+                )
             }
         }
     }
