@@ -90,7 +90,10 @@ fun MonthCalendarStrip(
                                 val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
                                 val bgColor = when {
                                     !isInRange -> Color.Transparent
-                                    hasEvent -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                                    // Eventos: más marcado en oscuro; en claro se mantiene sutil
+                                    hasEvent -> MaterialTheme.colorScheme.primary.copy(
+                                        alpha = if (isDark) 0.35f else 0.25f,
+                                    )
                                     isDark -> MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
                                     else -> Color.White
                                 }
