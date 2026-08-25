@@ -2,9 +2,11 @@ package com.rodneymarin.tempus.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.background
@@ -22,6 +24,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -210,6 +213,45 @@ object TempusComponents {
                 elevation = noElevation,
                 content = content,
             )
+        }
+    }
+
+    // ============ SHEET DE CONFIRMACIÓN ============
+
+    /**
+     * Sheet inferior estilo M3 para confirmaciones: título + única acción
+     * afirmativa (sin botón de cancelar). El usuario cierra haciendo tap
+     * fuera del sheet o deslizando hacia abajo.
+     */
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun ConfirmSheet(
+        title: String,
+        actionLabel: String,
+        actionContainerColor: Color,
+        actionContentColor: Color,
+        onConfirm: () -> Unit,
+        onDismiss: () -> Unit,
+    ) {
+        ModalBottomSheet(onDismissRequest = onDismiss) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 28.dp),
+            ) {
+                Text(title, style = MaterialTheme.typography.titleLarge)
+                Button(
+                    onClick = onConfirm,
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = actionContainerColor,
+                        contentColor = actionContentColor,
+                    ),
+                    shape = PillShape,
+                ) { Text(actionLabel, style = MaterialTheme.typography.labelLarge) }
+            }
         }
     }
 

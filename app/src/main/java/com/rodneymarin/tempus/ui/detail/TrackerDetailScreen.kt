@@ -20,7 +20,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,7 +34,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -249,105 +247,58 @@ fun TrackerDetailScreen(
         }
     }
 
-    // Material3 styled dialogs with standardized buttons
+    // Confirmaciones como bottom sheets M3 (solo acción afirmativa;
+    // se cierran con tap fuera o deslizando hacia abajo)
     logToDelete?.let { entry ->
-        AlertDialog(
-            onDismissRequest = { logToDelete = null },
-            title = { Text(stringResource(R.string.delete_log_confirm), style = MaterialTheme.typography.titleLarge) },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.deleteLog(entry.id)
-                        logToDelete = null
-                    },
-                    modifier = Modifier.padding(end = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    ),
-                    shape = RoundedCornerShape(50),
-                ) { Text(stringResource(R.string.delete_confirm_action)) }
+        TempusComponents.ConfirmSheet(
+            title = stringResource(R.string.delete_log_confirm),
+            actionLabel = stringResource(R.string.delete_confirm_action),
+            actionContainerColor = MaterialTheme.colorScheme.errorContainer,
+            actionContentColor = MaterialTheme.colorScheme.onErrorContainer,
+            onConfirm = {
+                viewModel.deleteLog(entry.id)
+                logToDelete = null
             },
-            dismissButton = {
-                TextButton(onClick = { logToDelete = null }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
+            onDismiss = { logToDelete = null },
         )
     }
 
     registerDay?.let { day ->
-        AlertDialog(
-            onDismissRequest = { registerDay = null },
-            title = { Text(stringResource(R.string.register_day_confirm, day.format(dayFormatter)), style = MaterialTheme.typography.titleLarge) },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.logOn(day, null)
-                        registerDay = null
-                    },
-                    modifier = Modifier.padding(end = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-                    shape = RoundedCornerShape(50),
-                ) { Text(stringResource(R.string.register)) }
+        TempusComponents.ConfirmSheet(
+            title = stringResource(R.string.register_day_confirm, day.format(dayFormatter)),
+            actionLabel = stringResource(R.string.register),
+            actionContainerColor = MaterialTheme.colorScheme.primary,
+            actionContentColor = MaterialTheme.colorScheme.onPrimary,
+            onConfirm = {
+                viewModel.logOn(day, null)
+                registerDay = null
             },
-            dismissButton = {
-                TextButton(onClick = { registerDay = null }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
+            onDismiss = { registerDay = null },
         )
     }
 
     deleteDay?.let { day ->
-        AlertDialog(
-            onDismissRequest = { deleteDay = null },
-            title = { Text(stringResource(R.string.delete_day_confirm), style = MaterialTheme.typography.titleLarge) },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.deleteDay(day)
-                        deleteDay = null
-                    },
-                    modifier = Modifier.padding(end = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    ),
-                    shape = RoundedCornerShape(50),
-                ) { Text(stringResource(R.string.delete_confirm_action)) }
+        TempusComponents.ConfirmSheet(
+            title = stringResource(R.string.delete_day_confirm),
+            actionLabel = stringResource(R.string.delete_confirm_action),
+            actionContainerColor = MaterialTheme.colorScheme.errorContainer,
+            actionContentColor = MaterialTheme.colorScheme.onErrorContainer,
+            onConfirm = {
+                viewModel.deleteDay(day)
+                deleteDay = null
             },
-            dismissButton = {
-                TextButton(onClick = { deleteDay = null }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
+            onDismiss = { deleteDay = null },
         )
     }
 
     if (confirmDeleteTracker) {
-        AlertDialog(
-            onDismissRequest = { confirmDeleteTracker = false },
-            title = { Text(stringResource(R.string.delete_tracker_confirm, tracker?.name ?: ""), style = MaterialTheme.typography.titleLarge) },
-            confirmButton = {
-                Button(
-                    onClick = { viewModel.deleteTracker() },
-                    modifier = Modifier.padding(end = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    ),
-                    shape = RoundedCornerShape(50),
-                ) { Text(stringResource(R.string.delete_confirm_action)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { confirmDeleteTracker = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
+        TempusComponents.ConfirmSheet(
+            title = stringResource(R.string.delete_tracker_confirm, tracker?.name ?: ""),
+            actionLabel = stringResource(R.string.delete_confirm_action),
+            actionContainerColor = MaterialTheme.colorScheme.errorContainer,
+            actionContentColor = MaterialTheme.colorScheme.onErrorContainer,
+            onConfirm = { viewModel.deleteTracker() },
+            onDismiss = { confirmDeleteTracker = false },
         )
     }
 }
