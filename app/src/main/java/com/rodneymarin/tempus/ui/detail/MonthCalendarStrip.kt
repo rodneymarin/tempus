@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +40,7 @@ fun MonthCalendarStrip(
     today: LocalDate,
     onDayClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
+    daysWithComment: Set<LocalDate> = emptySet(),
 ) {
     val startDate = today.minusDays(29)
     val endDate = today
@@ -86,22 +90,24 @@ fun MonthCalendarStrip(
                                 val isInRange = !cellDate.isBefore(monthStart) && !cellDate.isAfter(monthEnd)
                                 val isToday = cellDate == today
                                 val hasEvent = isInRange && (cellDate in daysWithEvent)
+                                val hasComment = isInRange && (cellDate in daysWithComment)
 
                                 val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+                                val primaryColor = MaterialTheme.colorScheme.primary
                                 val bgColor = when {
                                     !isInRange -> Color.Transparent
                                     // Eventos: más marcado en oscuro; en claro se mantiene sutil
-                                    hasEvent -> MaterialTheme.colorScheme.primary.copy(
+                                    hasEvent -> primaryColor.copy(
                                         alpha = if (isDark) 0.35f else 0.25f,
                                     )
-                                    isDark -> MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                                    isDark -> primaryColor.copy(alpha = 0.10f)
                                     else -> Color.White
                                 }
 
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
-                                        .aspectRatio(1f)
+                                        .aspectRatio(1f / 1.15f)
                                         .clip(RoundedCornerShape(10.dp))
                                         .then(if (isInRange) Modifier.clickable { onDayClick(cellDate) } else Modifier)
                                         .background(bgColor)
@@ -118,18 +124,40 @@ fun MonthCalendarStrip(
                                            	style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
-                                        Text(
-                                            text = cellDate.dayOfMonth.toString(),
-                                            modifier = Modifier.offset(y = 4.dp),
-                                            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                        )
                                         if (isToday) {
+                                            // Número del día actual en círculo primario
                                             Box(
-                                                Modifier
-                                                    .size(8.dp)
-                                                    .background(MaterialTheme.colorScheme.primary, CircleShape)
-                                                    .align(Alignment.TopEnd),
+                                                modifier = Modifier
+                                                    .offset(y = 4.dp)
+                                                    .size(24.dp)
+                                                    .background(primaryColor, CircleShape),
+                                                contentAlignment = Alignment.Center,
+                                            ) {
+                                                Text(
+                                                    text = cellDate.dayOfMonth.toString(),
+                                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                                        fontSize = 13.sp,
+                                                        color = MaterialTheme.colorScheme.onPrimary,
+                                                    ),
+                                                )
+                                            }
+                                        } else {
+                                            Text(
+                                                text = cellDate.dayOfMonth.toString(),
+                                                modifier = Modifier.offset(y = 4.dp),
+                                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
+                                                color = MaterialTheme.colorScheme.onSurface,
+                                            )
+                                        }
+                                        if (hasComment) {
+                                            // Hoja de cuaderno: el día tiene comentario
+                                            Icon(
+                                                Icons.Default.Description,
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .align(Alignment.TopEnd)
+                                                    .size(12.dp),
+                                                tint = MaterialTheme.colorScheme.primary,
                                             )
                                         }
                                     }

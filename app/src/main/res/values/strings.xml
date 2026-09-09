@@ -24,11 +24,16 @@
     <string name="edit">Editar</string>
     <string name="log_today">Sucedió hoy</string>
     <string name="log_today_done">Ya se registró hoy</string>
+    <string name="action_today">Hoy</string>
+    <string name="action_today_done">Registrado hoy</string>
     <string name="register_day_confirm">¿Registrar evento el día %1$s?</string>
+    <string name="edit_day_title">Evento del %1$s</string>
+    <string name="accept">Aceptar</string>
+    <string name="comment_placeholder">Comentario (opcional)</string>
     <string name="delete_day_confirm">Este día ya tiene un evento registrado. ¿Deseas eliminarlo?</string>
     <string name="log_registered">Registrado</string>
     <string name="undo">Deshacer</string>
-    <string name="log_another_day">Registrar día manual</string>
+    <string name="log_another_day">Otro día</string>
     <string name="date_label">Fecha</string>
     <string name="time_label">Hora (opcional)</string>
     <string name="add_time">Añadir hora</string>

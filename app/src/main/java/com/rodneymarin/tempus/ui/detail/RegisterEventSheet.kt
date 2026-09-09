@@ -40,13 +40,14 @@ import java.util.Locale
 @Composable
 fun RegisterEventSheet(
     onDismiss: () -> Unit,
-    onConfirm: (LocalDate, Int?) -> Unit,
+    onConfirm: (LocalDate, Int?, String?) -> Unit,
     daysWithEvent: Set<LocalDate>,
 ) {
     val today = LocalDate.now()
     var showDatePicker by remember { mutableStateOf(false) }
     var showTime by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf(today) }
+    var comment by remember { mutableStateOf("") }
     val now = java.time.LocalTime.now()
     val timeState = rememberTimePickerState(
         initialHour = now.hour,
@@ -96,6 +97,17 @@ fun RegisterEventSheet(
             TimePicker(state = timeState)
         }
 
+        // Comentario opcional del registro (celda relativamente alta)
+        TempusComponents.TempusTextField(
+            value = comment,
+            onValueChange = { comment = it },
+            placeholder = stringResource(R.string.comment_placeholder),
+            singleLine = false,
+            minLines = 4,
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth(),
+        )
+
         if (selectedDate in daysWithEvent) {
             val replacement = stringResource(
                 if (showTime) R.string.sheet_replaces_with_time else R.string.sheet_replaces_no_time
@@ -109,7 +121,13 @@ fun RegisterEventSheet(
 
         // Primary action button - using PrimaryButton style
         Button(
-            onClick = { onConfirm(selectedDate, if (showTime) timeState.hour * 60 + timeState.minute else null) },
+            onClick = {
+                onConfirm(
+                    selectedDate,
+                    if (showTime) timeState.hour * 60 + timeState.minute else null,
+                    comment.trim().takeIf { it.isNotEmpty() },
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),

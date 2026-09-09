@@ -22,10 +22,24 @@ class TrackersRepository(private val db: TempusDatabase) {
 
     suspend fun deleteTracker(id: Long) = trackerDao.deleteById(id)
 
-    suspend fun logEvent(trackerId: Long, epochDay: Long, timeMinutes: Int?): Long =
-        logDao.insert(LogEntry(trackerId = trackerId, epochDay = epochDay, timeMinutes = timeMinutes))
+    suspend fun logEvent(
+        trackerId: Long,
+        epochDay: Long,
+        timeMinutes: Int?,
+        comment: String? = null,
+    ): Long = logDao.insert(
+        LogEntry(
+            trackerId = trackerId,
+            epochDay = epochDay,
+            timeMinutes = timeMinutes,
+            comment = comment,
+        )
+    )
 
     suspend fun deleteLog(id: Long) = logDao.deleteById(id)
 
     suspend fun deleteLogsForDay(trackerId: Long, epochDay: Long) = logDao.deleteByDay(trackerId, epochDay)
+
+    suspend fun updateComment(trackerId: Long, epochDay: Long, comment: String?) =
+        logDao.updateComment(trackerId, epochDay, comment)
 }

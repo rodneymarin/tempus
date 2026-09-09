@@ -24,4 +24,5 @@ data class LogEntry(
     val trackerId: Long,
     val epochDay: Long,
     val timeMinutes: Int? = null,
+    val comment: String? = null,
 )

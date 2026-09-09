@@ -66,9 +66,9 @@ class TrackerDetailViewModel(
     }
 
     /** Register an occurrence on [date]; [timeMinutes] null = "sin hora". */
-    fun logOn(date: LocalDate, timeMinutes: Int?) {
+    fun logOn(date: LocalDate, timeMinutes: Int?, comment: String? = null) {
         viewModelScope.launch {
-            val id = repo.logEvent(trackerId, date.toEpochDay(), timeMinutes)
+            val id = repo.logEvent(trackerId, date.toEpochDay(), timeMinutes, comment)
             _lastLog.value = LogConfirmation(id)
         }
     }
@@ -88,6 +88,13 @@ class TrackerDetailViewModel(
         _lastLog.value = null
         viewModelScope.launch {
             repo.deleteLogsForDay(trackerId, date.toEpochDay())
+        }
+    }
+
+    /** Edita (o borra) el comentario de un día con evento registrado. */
+    fun updateComment(date: LocalDate, comment: String?) {
+        viewModelScope.launch {
+            repo.updateComment(trackerId, date.toEpochDay(), comment?.trim()?.takeIf { it.isNotEmpty() })
         }
     }
 

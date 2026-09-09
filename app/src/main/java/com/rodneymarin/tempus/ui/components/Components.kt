@@ -1,8 +1,10 @@
 package com.rodneymarin.tempus.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +27,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -43,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rodneymarin.tempus.R
 import com.rodneymarin.tempus.domain.FrequencyPeriod
@@ -143,6 +147,66 @@ object TempusComponents {
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
         ) {
             Text(label, style = MaterialTheme.typography.labelLarge)
+        }
+    }
+
+    /**
+     * Botón de acción con dos variantes desde un mismo componente:
+     * - primary = true: relleno con color primario.
+     * - primary = false: secundario, OutlineButton con borde suave.
+     * Padding interno menor que el estándar, pensado para pares lado a lado.
+     */
+    @Composable
+    fun ActionButton(
+        onClick: () -> Unit,
+        label: String,
+        primary: Boolean,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        icon: (@Composable () -> Unit)? = null,
+    ) {
+        val contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+        val labelComposable: @Composable () -> Unit = {
+            if (icon != null) {
+                icon()
+                Spacer(Modifier.size(8.dp))
+            }
+            Text(
+                label,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        if (primary) {
+            val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+            Button(
+                onClick = onClick,
+                modifier = modifier,
+                enabled = enabled,
+                shape = PillShape,
+                contentPadding = contentPadding,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor =
+                        if (isDark) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                        else MaterialTheme.colorScheme.surfaceVariant,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
+                ),
+            ) { labelComposable() }
+        } else {
+            OutlinedButton(
+                onClick = onClick,
+                modifier = modifier,
+                enabled = enabled,
+                shape = PillShape,
+                contentPadding = contentPadding,
+                border = BorderStroke(
+                    1.5.dp,
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.30f),
+                ),
+            ) { labelComposable() }
         }
     }
 
@@ -264,6 +328,8 @@ object TempusComponents {
         placeholder: String,
         modifier: Modifier = Modifier,
         singleLine: Boolean = true,
+        minLines: Int = 1,
+        shape: Shape = PillShape,
         isError: Boolean = false,
         supportingText: String? = null,
     ) {
@@ -279,11 +345,12 @@ object TempusComponents {
                 )
             },
             singleLine = singleLine,
+            minLines = minLines,
+            shape = shape,
             isError = isError,
             supportingText = if (supportingText != null) {
                 { Text(supportingText) }
             } else null,
-            shape = PillShape,
             colors = filledFieldColors(),
         )
     }

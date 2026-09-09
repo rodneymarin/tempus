@@ -30,3 +30,12 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         )
     }
 }
+
+/**
+ * v3 → v4: agrega la columna de comentario opcional a los registros de días.
+ */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE log_entries ADD COLUMN comment TEXT")
+    }
+}

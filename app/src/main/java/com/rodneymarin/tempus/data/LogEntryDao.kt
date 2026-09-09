@@ -20,6 +20,12 @@ interface LogEntryDao {
     @Query("DELETE FROM log_entries WHERE trackerId = :trackerId AND epochDay = :epochDay")
     suspend fun deleteByDay(trackerId: Long, epochDay: Long)
 
+    @Query(
+        "UPDATE log_entries SET comment = :comment " +
+            "WHERE trackerId = :trackerId AND epochDay = :epochDay"
+    )
+    suspend fun updateComment(trackerId: Long, epochDay: Long, comment: String?)
+
     @Query("DELETE FROM log_entries WHERE id = :id")
     suspend fun deleteById(id: Long)
 }

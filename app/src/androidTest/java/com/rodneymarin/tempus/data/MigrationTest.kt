@@ -72,4 +72,45 @@ class MigrationTest {
             org.junit.Assert.assertTrue(thrown)
         }
     }
+
+    @Test fun migrate3To4_preservesRowsAndAddsNullComment() {
+        helper.createDatabase("migration-test-comment", 3).use { db ->
+            db.execSQL(
+                "INSERT INTO trackers (id, name, emoji, minFrequency, maxFrequency, period, createdAt) " +
+                    "VALUES (1, 'A', 'x', NULL, NULL, 'WEEK', 0)"
+            )
+            db.execSQL(
+                "INSERT INTO log_entries (id, trackerId, epochDay, timeMinutes) VALUES (1, 1, 20000, 480)"
+            )
+            db.execSQL(
+                "INSERT INTO log_entries (id, trackerId, epochDay, timeMinutes) VALUES (2, 1, 20001, NULL)"
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate("migration-test-comment", 4, true, MIGRATION_3_4)
+
+        // Las filas previas sobreviven con comentario NULL…
+        db.query("SELECT id, epochDay, timeMinutes, comment FROM log_entries ORDER BY id").use { c ->
+            assertEquals(2, c.count)
+            c.moveToFirst()
+            assertEquals(1, c.getLong(0))
+            assertEquals(20000, c.getLong(1))
+            assertEquals(480, c.getLong(2))
+            org.junit.Assert.assertTrue(c.isNull(3))
+            c.moveToNext()
+            assertEquals(2, c.getLong(0))
+            org.junit.Assert.assertTrue(c.isNull(3))
+        }
+
+        // …y la nueva columna acepta comentarios en inserciones nuevas.
+        db.execSQL(
+            "INSERT INTO log_entries (id, trackerId, epochDay, timeMinutes, comment) " +
+                "VALUES (3, 1, 20002, NULL, 'nota de prueba')"
+        )
+        db.query("SELECT comment FROM log_entries WHERE id = 3").use { c ->
+            org.junit.Assert.assertTrue(c.moveToFirst())
+            assertEquals("nota de prueba", c.getString(0))
+        }
+        db.close()
+    }
 }

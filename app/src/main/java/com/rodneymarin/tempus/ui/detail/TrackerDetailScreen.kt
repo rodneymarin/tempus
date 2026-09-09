@@ -13,21 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -43,8 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -78,7 +72,7 @@ fun TrackerDetailScreen(
     var showSheet by remember { mutableStateOf(false) }
     var logToDelete by remember { mutableStateOf<LogEntry?>(null) }
     var registerDay by remember { mutableStateOf<LocalDate?>(null) }
-    var deleteDay by remember { mutableStateOf<LocalDate?>(null) }
+    var editDay by remember { mutableStateOf<LocalDate?>(null) }
     var confirmDeleteTracker by remember { mutableStateOf(false) }
     val dayFormatter = remember { DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es")) }
 
@@ -103,6 +97,10 @@ fun TrackerDetailScreen(
     val today = LocalDate.now()
     val daysWithEvent = ui.dailyCounts.filterValues { it > 0 }.keys
     val todayHasEvent = (ui.dailyCounts[today] ?: 0) > 0
+    val daysWithComment = ui.history
+        .filter { !it.comment.isNullOrBlank() }
+        .map { LocalDate.ofEpochDay(it.epochDay) }
+        .toSet()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -168,45 +166,33 @@ fun TrackerDetailScreen(
                 }
             }
 
-            // Actions - using standardized buttons
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
-                Button(
+            // Actions - par de botones lado a lado con el mismo componente
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                TempusComponents.ActionButton(
                     onClick = viewModel::logToday,
+                    label = stringResource(
+                        if (todayHasEvent) R.string.action_today_done else R.string.action_today,
+                    ),
+                    primary = true,
                     enabled = !todayHasEvent,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledContainerColor =
-                            if (isDark) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
-                            else MaterialTheme.colorScheme.surfaceVariant,
-                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
-                    ),
-                    shape = RoundedCornerShape(50),
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        stringResource(if (todayHasEvent) R.string.log_today_done else R.string.log_today),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-                OutlinedButton(
+                    icon = {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    },
+                    modifier = Modifier.weight(1f).height(48.dp),
+                )
+                TempusComponents.ActionButton(
                     onClick = { showSheet = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    border = androidx.compose.foundation.BorderStroke(
-                        1.5.dp,
-                        MaterialTheme.colorScheme.outline.copy(alpha = 0.30f),
-                    ),
-                    shape = RoundedCornerShape(50),
-                ) {
-                    Text(stringResource(R.string.log_another_day), style = MaterialTheme.typography.labelLarge)
-                }
+                    label = stringResource(R.string.log_another_day),
+                    primary = false,
+                    modifier = Modifier.weight(1f).height(48.dp),
+                )
             }
 
             // 30-day calendar
@@ -214,8 +200,9 @@ fun TrackerDetailScreen(
             MonthCalendarStrip(
                 daysWithEvent = daysWithEvent,
                 today = today,
+                daysWithComment = daysWithComment,
                 onDayClick = { day ->
-                    if (day in daysWithEvent) deleteDay = day else registerDay = day
+                    if (day in daysWithEvent) editDay = day else registerDay = day
                 },
             )
 
@@ -238,8 +225,8 @@ fun TrackerDetailScreen(
         ModalBottomSheet(onDismissRequest = { showSheet = false }) {
             RegisterEventSheet(
                 onDismiss = { showSheet = false },
-                onConfirm = { date, timeMinutes ->
-                    viewModel.logOn(date, timeMinutes)
+                onConfirm = { date, timeMinutes, comment ->
+                    viewModel.logOn(date, timeMinutes, comment)
                     showSheet = false
                 },
                 daysWithEvent = daysWithEvent,
@@ -277,17 +264,21 @@ fun TrackerDetailScreen(
         )
     }
 
-    deleteDay?.let { day ->
-        TempusComponents.ConfirmSheet(
-            title = stringResource(R.string.delete_day_confirm),
-            actionLabel = stringResource(R.string.delete_confirm_action),
-            actionContainerColor = MaterialTheme.colorScheme.errorContainer,
-            actionContentColor = MaterialTheme.colorScheme.onErrorContainer,
-            onConfirm = {
-                viewModel.deleteDay(day)
-                deleteDay = null
+    editDay?.let { day ->
+        EditDaySheet(
+            date = day,
+            initialComment = ui.history
+                .firstOrNull { it.epochDay == day.toEpochDay() }
+                ?.comment,
+            onSave = { comment ->
+                viewModel.updateComment(day, comment)
+                editDay = null
             },
-            onDismiss = { deleteDay = null },
+            onDelete = {
+                viewModel.deleteDay(day)
+                editDay = null
+            },
+            onDismiss = { editDay = null },
         )
     }
 
